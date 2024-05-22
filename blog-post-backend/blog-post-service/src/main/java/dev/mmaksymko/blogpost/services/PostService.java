@@ -1,4 +1,4 @@
-package dev.mmaksymko.blogpost.service;
+package dev.mmaksymko.blogpost.services;
 
 import dev.mmaksymko.blogpost.dto.PostRequest;
 import dev.mmaksymko.blogpost.dto.PostResponse;

@@ -3,7 +3,7 @@ package dev.mmaksymko.blogpost.controllers;
 import dev.mmaksymko.blogpost.dto.PostRequest;
 import dev.mmaksymko.blogpost.dto.PostResponse;
 import dev.mmaksymko.blogpost.dto.PostUpdateRequest;
-import dev.mmaksymko.blogpost.service.PostService;
+import dev.mmaksymko.blogpost.services.PostService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
