@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(name = "post")
 public class Post {
-    // TODO background picture
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
@@ -28,7 +27,7 @@ public class Post {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "author_id", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long authorId;
 
     @Column(name = "posted_at", updatable = false)
