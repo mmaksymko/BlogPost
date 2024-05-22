@@ -2,6 +2,7 @@ package dev.mmaksymko.blogpost.service;
 
 import dev.mmaksymko.blogpost.dto.PostRequest;
 import dev.mmaksymko.blogpost.dto.PostResponse;
+import dev.mmaksymko.blogpost.dto.PostUpdateRequest;
 import dev.mmaksymko.blogpost.mappers.PostMapper;
 import dev.mmaksymko.blogpost.models.Post;
 import dev.mmaksymko.blogpost.repositories.PostRepository;
@@ -41,12 +42,13 @@ public class PostService {
 
     @Transactional
     @Modifying
-    public PostResponse updatePost(Long id, PostRequest requestPost) {
+    public PostResponse updatePost(Long id, PostUpdateRequest requestPost) {
         Post retrievedPost = postRepository.findById(id).orElseThrow();
 
-        Post post = postMapper.toEntity(id, requestPost);
+        retrievedPost.setTitle(requestPost.title());
+        retrievedPost.setContent(requestPost.content());
 
-        Post savedPost = postRepository.save(post);
+        Post savedPost = postRepository.save(retrievedPost);
 
         return postMapper.toResponse(savedPost);
     }

@@ -2,6 +2,7 @@ package dev.mmaksymko.blogpost.controllers;
 
 import dev.mmaksymko.blogpost.dto.PostRequest;
 import dev.mmaksymko.blogpost.dto.PostResponse;
+import dev.mmaksymko.blogpost.dto.PostUpdateRequest;
 import dev.mmaksymko.blogpost.service.PostService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,7 +31,7 @@ public class PostController {
     }
 
     @PutMapping("{id}/")
-    public PostResponse updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
+    public PostResponse updatePost(@PathVariable Long id, @RequestBody PostUpdateRequest request) {
         return postService.updatePost(id, request);
     }
 

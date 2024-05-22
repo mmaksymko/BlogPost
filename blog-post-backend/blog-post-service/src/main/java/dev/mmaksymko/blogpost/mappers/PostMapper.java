@@ -19,13 +19,8 @@ public class PostMapper {
     }
 
     public Post toEntity(PostRequest postRequest) {
-        return toEntity(null, postRequest);
-    }
-
-    public Post toEntity(Long id, PostRequest postRequest) {
         return Post
                 .builder()
-                .id(id)
                 .title(postRequest.title())
                 .content(postRequest.content())
                 .authorId(postRequest.authorId())
