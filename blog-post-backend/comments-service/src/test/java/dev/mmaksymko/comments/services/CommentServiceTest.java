@@ -39,7 +39,7 @@ public class CommentServiceTest {
         when(commentRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(comment)));
         when(commentMapper.toResponse(comment)).thenReturn(commentResponse);
 
-        Page<CommentResponse> comments = commentService.getComments(PageRequest.of(0, 10));
+        Page<CommentResponse> comments = commentService.getComments(null, PageRequest.of(0, 10));
 
         assertEquals(1, comments.getContent().size());
         assertEquals(commentResponse, comments.getContent().get(0));

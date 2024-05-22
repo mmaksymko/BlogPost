@@ -16,8 +16,11 @@ public class CommentController {
     public final CommentService commentService;
 
     @GetMapping
-    public Page<CommentResponse> getComments(Pageable pageable) {
-        return commentService.getComments(pageable);
+    public Page<CommentResponse> getComments(
+            @RequestParam(required = false) Long postId,
+            Pageable pageable
+    ) {
+        return commentService.getComments(postId, pageable);
     }
 
     @GetMapping("{id}/")

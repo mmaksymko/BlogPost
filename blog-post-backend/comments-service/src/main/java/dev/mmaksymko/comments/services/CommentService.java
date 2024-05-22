@@ -21,10 +21,16 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
 
-    public Page<CommentResponse> getComments(Pageable pageable) {
-        commentRepository.findAll(pageable).forEach(x -> System.out.println(x.getParentComment() == null ? null : x.getParentComment().getCommentId()));
-        return commentRepository.findAll(pageable).map(commentMapper::toResponse);
-    }
+    public Page<CommentResponse> getComments(Long postId, Pageable pageable) {
+        Page<Comment> comments;
+
+        if (postId != null) {
+            comments = commentRepository.findAllByPostId(pageable, postId);
+        } else {
+            comments = commentRepository.findAll(pageable);
+        }
+
+        return comments.map(commentMapper::toResponse);}
 
     public CommentResponse getComment(Long id) {
         return commentRepository.findById(id).map(commentMapper::toResponse).orElseThrow();
