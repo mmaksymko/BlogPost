@@ -2,6 +2,7 @@ package dev.mmaksymko.comments.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class BaseCommentResponse {
     private Long commentId;
     private Long postId;
