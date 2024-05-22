@@ -1,0 +1,17 @@
+spring:
+  application:
+    name:
+      config-server
+  cloud:
+    config:
+      server:
+        git:
+          default-label: main
+          uri: https://github.com/mmaksymko/blogpost-config
+
+server:
+  port:
+    8071
+
+encrypt:
+  key: *your encription key*

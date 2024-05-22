@@ -2,23 +2,5 @@ spring:
   application:
     name:
       blog-post-service
-
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-  datasource:
-    driverClassName:
-      org.postgresql.Driver
-    url:
-      *your url*
-    username:
-      *your username*
-    password:
-      *your password*
-
-server:
-  port:
-    8081
-
-
+  config:
+    import: optional:configserver:http://localhost:8071
