@@ -8,10 +8,13 @@ import dev.mmaksymko.blogpost.repositories.PostRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
@@ -26,6 +29,8 @@ public class PostService {
         return postMapper.toResponse(post);
     }
 
+    @Transactional
+    @Modifying
     public PostResponse addPost(PostRequest requestPost) {
         Post post = postMapper.toEntity(requestPost);
 
@@ -34,6 +39,8 @@ public class PostService {
         return postMapper.toResponse(savedPost);
     }
 
+    @Transactional
+    @Modifying
     public PostResponse updatePost(Long id, PostRequest requestPost) {
         Post retrievedPost = postRepository.findById(id).orElseThrow();
 
@@ -44,6 +51,8 @@ public class PostService {
         return postMapper.toResponse(savedPost);
     }
 
+    @Transactional
+    @Modifying
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
