@@ -1,11 +1,13 @@
 package dev.mmaksymko.comments.services;
 
+import dev.mmaksymko.comments.clients.PostClient;
 import dev.mmaksymko.comments.configs.ResourceGoneException;
 import dev.mmaksymko.comments.dto.CommentRequest;
 import dev.mmaksymko.comments.dto.CommentResponse;
 import dev.mmaksymko.comments.dto.CommentUpdateRequest;
 import dev.mmaksymko.comments.mappers.CommentMapper;
 import dev.mmaksymko.comments.models.Comment;
+import dev.mmaksymko.comments.models.Post;
 import dev.mmaksymko.comments.repositories.CommentRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final PostClient postClient;
 
     public Page<CommentResponse> getComments(Long postId, Pageable pageable) {
         Page<Comment> comments;
@@ -40,6 +43,8 @@ public class CommentService {
     @Transactional
     @Modifying
     public CommentResponse addComment(CommentRequest request) {
+        Post post = postClient.getPost(request.postId());
+
         Comment parentComment = request.parentCommentId() != null
                 ? commentRepository.findById(request.parentCommentId()).orElseThrow()
                 : null;
