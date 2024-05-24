@@ -25,12 +25,13 @@ public class CommentService {
         Page<Comment> comments;
 
         if (postId != null) {
-            comments = commentRepository.findAllByPostId(pageable, postId);
+            comments = commentRepository.findAllByPostIdAndParentCommentIsNull(pageable, postId);
         } else {
             comments = commentRepository.findAll(pageable);
         }
 
-        return comments.map(commentMapper::toResponse);}
+        return comments.map(commentMapper::toResponse);
+    }
 
     public CommentResponse getComment(Long id) {
         return commentRepository.findById(id).map(commentMapper::toResponse).orElseThrow();
