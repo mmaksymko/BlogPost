@@ -6,6 +6,8 @@ import dev.mmaksymko.blogpost.dto.PostUpdateRequest;
 import dev.mmaksymko.blogpost.mappers.PostMapper;
 import dev.mmaksymko.blogpost.models.Post;
 import dev.mmaksymko.blogpost.repositories.PostRepository;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,8 @@ public class PostService {
 
     @Transactional
     @Modifying
+    @RateLimiter(name = "rate-limit-post")
+    @Retry(name = "retry-post")
     public PostResponse addPost(PostRequest requestPost) {
         Post post = postMapper.toEntity(requestPost);
 
@@ -42,6 +46,8 @@ public class PostService {
 
     @Transactional
     @Modifying
+    @RateLimiter(name = "rate-limit-post")
+    @Retry(name = "retry-post")
     public PostResponse updatePost(Long id, PostUpdateRequest requestPost) {
         Post retrievedPost = postRepository.findById(id).orElseThrow();
 
