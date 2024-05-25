@@ -1,7 +1,7 @@
 package dev.mmaksymko.comments.services;
 
 import dev.mmaksymko.comments.clients.PostClient;
-import dev.mmaksymko.comments.configs.ResourceGoneException;
+import dev.mmaksymko.comments.configs.exceptions.ResourceGoneException;
 import dev.mmaksymko.comments.dto.CommentRequest;
 import dev.mmaksymko.comments.dto.CommentResponse;
 import dev.mmaksymko.comments.dto.CommentUpdateRequest;
@@ -9,6 +9,9 @@ import dev.mmaksymko.comments.mappers.CommentMapper;
 import dev.mmaksymko.comments.models.Comment;
 import dev.mmaksymko.comments.models.Post;
 import dev.mmaksymko.comments.repositories.CommentRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,12 +39,11 @@ public class CommentService {
         return comments.map(commentMapper::toResponse);
     }
 
-    public CommentResponse getComment(Long id) {
-        return commentRepository.findById(id).map(commentMapper::toResponse).orElseThrow();
-    }
-
     @Transactional
     @Modifying
+    @CircuitBreaker(name = "circuit-breaker-comment")
+    @Retry(name = "retry-comment")
+    @RateLimiter(name = "rate-limit-comment")
     public CommentResponse addComment(CommentRequest request) {
         Post post = postClient.getPost(request.postId());
 
@@ -56,8 +58,14 @@ public class CommentService {
         return commentMapper.toResponse(savedComment);
     }
 
+    public CommentResponse getComment(Long id) {
+        return commentRepository.findById(id).map(commentMapper::toResponse).orElseThrow();
+    }
+
     @Transactional
     @Modifying
+    @Retry(name = "retry-comment")
+    @RateLimiter(name = "rate-limit-comment")
     public CommentResponse updateComment(Long id, CommentUpdateRequest request) {
         Comment retrievedComment = commentRepository.findById(id).orElseThrow();
 
