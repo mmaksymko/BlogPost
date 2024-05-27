@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ServerWebInputException;
 
 import java.util.NoSuchElementException;
 
@@ -43,6 +44,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxRetriesExceededException.class)
     public ResponseEntity<ErrorResponse> handleException(MaxRetriesExceededException e) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ServerWebInputException.class)
+    public ResponseEntity<ErrorResponse> handleException(ServerWebInputException e) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
