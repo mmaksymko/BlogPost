@@ -29,6 +29,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class PostServiceTest {
+    private static final String TEST_TITLE = "Test Title";
+    private static final String TEST_CONTENT = "Test Content";
+    private static final String UPDATED_TITLE = "Updated Title";
+    private static final String UPDATED_CONTENT = "Updated Content";
 
     @Mock
     private PostRepository postRepository;
@@ -45,12 +49,12 @@ public class PostServiceTest {
 
     @BeforeEach
     public void setup() {
-
         MockitoAnnotations.openMocks(this);
-        post = Post.builder().title("Test Title").content("Test Content").build();
-        postResponse = new PostResponse(1L, "Test Title", "Test Content", 1L, null);
-        postRequest = new PostRequest("Test Title", "Test Content", 1L);
-        postUpdateRequest = new PostUpdateRequest("Updated Title", "Updated Content");
+
+        post = Post.builder().title(TEST_TITLE).content(TEST_CONTENT).build();
+        postResponse = new PostResponse(1L, TEST_TITLE, TEST_CONTENT, 1L, null);
+        postRequest = new PostRequest(TEST_TITLE, TEST_CONTENT, 1L);
+        postUpdateRequest = new PostUpdateRequest(UPDATED_TITLE, UPDATED_CONTENT);
         pageable = Pageable.unpaged();
     }
 
@@ -58,7 +62,7 @@ public class PostServiceTest {
     @Nested
     class GetPostsTests {
         @Test
-        @DisplayName("returns a page of posts")
+        @DisplayName("Returns a page of posts")
         public void whenPostsExist() {
             when(postRepository.findAll(pageable)).thenReturn(new PageImpl<>(Collections.singletonList(post)));
             when(postMapper.toResponse(post)).thenReturn(postResponse);
@@ -73,7 +77,7 @@ public class PostServiceTest {
         }
 
         @Test
-        @DisplayName("returns empty page when none inserted")
+        @DisplayName("Returns empty page when none inserted")
         public void whenNoPostsExist() {
             when(postRepository.findAll(pageable)).thenReturn(new PageImpl<>(Collections.emptyList()));
 
@@ -88,8 +92,8 @@ public class PostServiceTest {
     @Nested
     class GetPostTests {
         @ParameterizedTest
-        @DisplayName("returns the post specified by id")
-        @ValueSource(longs = {1L, 2L, 3L})
+        @DisplayName("Returns the post specified by id")
+        @ValueSource(longs = {1L, Long.MIN_VALUE, Long.MIN_VALUE, 0L})
         public void whenIdExists(Long id) {
             when(postRepository.findById(id)).thenReturn(Optional.of(post));
             when(postMapper.toResponse(post)).thenReturn(postResponse);
@@ -103,7 +107,7 @@ public class PostServiceTest {
         }
 
         @Test
-        @DisplayName("throws NoSuchElementException when id is inexistent")
+        @DisplayName("Throws NoSuchElementException when id is inexistent")
         public void whenIdDoesNotExist() {
             Long testId = 2L;
 
@@ -118,7 +122,7 @@ public class PostServiceTest {
     @Nested
     class AddPostTests {
         @Test
-        @DisplayName("added post is returned")
+        @DisplayName("Added post is returned")
         public void whenPostIsValid() {
             when(postMapper.toEntity(any(PostRequest.class))).thenReturn(post);
             when(postRepository.save(any(Post.class))).thenReturn(post);
@@ -137,7 +141,7 @@ public class PostServiceTest {
     @Nested
     class UpdatePostTests {
         @Test
-        @DisplayName("updated post is returned")
+        @DisplayName("Updated post is returned")
         public void whenPostExists() {
             Long id = 1L;
 
@@ -154,7 +158,7 @@ public class PostServiceTest {
         }
 
         @Test
-        @DisplayName("throws exception when post does not exist")
+        @DisplayName("Throws exception when post does not exist")
         public void whenPostDoesNotExist() {
             Long id = 1L;
 
@@ -166,15 +170,18 @@ public class PostServiceTest {
         }
     }
 
-    @Test
-    @DisplayName("DeletePost: post is deleted")
-    public void testDeletePost() {
-        Long id = 1L;
+    @Nested
+    class DeletePostTests {
+        @Test
+        @DisplayName("Post is deleted")
+        public void testDeletePost() {
+            Long id = 1L;
 
-        doNothing().when(postRepository).deleteById(id);
+            doNothing().when(postRepository).deleteById(id);
 
-        postService.deletePost(id);
+            postService.deletePost(id);
 
-        verify(postRepository, times(1)).deleteById(id);
+            verify(postRepository, times(1)).deleteById(id);
+        }
     }
 }
