@@ -25,8 +25,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class PostServiceTest {
 
@@ -128,13 +127,14 @@ public class PostServiceTest {
         PostResponse result = postService.addPost(postRequest);
 
         assertEquals(postResponse, result);
+
         verify(postMapper).toEntity(postRequest);
         verify(postRepository).save(post);
         verify(postMapper).toResponse(post);
     }
 
     @Test
-    @DisplayName("AddPost: updated post is returned")
+    @DisplayName("UpdatePost: updated post is returned")
     public void testUpdatePost() {
         Long id = 1L;
         PostUpdateRequest postUpdateRequest = new PostUpdateRequest("Updated Title", "Updated Content");
@@ -151,5 +151,29 @@ public class PostServiceTest {
         verify(postRepository).findById(id);
         verify(postRepository).save(post);
         verify(postMapper).toResponse(post);
+    }
+
+    @Test
+    @DisplayName("UpdatePost: throws exception when post does not exist")
+    public void testUpdatePostWhenInexistentIdThrowsNoSuchElement() {
+        Long id = 1L;
+        PostUpdateRequest postUpdateRequest = new PostUpdateRequest("Updated Title", "Updated Content");
+
+        when(postRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> postService.updatePost(id, postUpdateRequest));
+
+        verify(postRepository).findById(id);
+    }
+    @Test
+    @DisplayName("DeletePost: post is deleted")
+    public void testDeletePost() {
+        Long id = 1L;
+
+        doNothing().when(postRepository).deleteById(id);
+
+        postService.deletePost(id);
+
+        verify(postRepository).deleteById(id);
     }
 }
