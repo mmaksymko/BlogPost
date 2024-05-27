@@ -14,4 +14,4 @@ server:
     8071
 
 encrypt:
-  key: *your encription key here*
+  key: ${BLOGPOST_ENCRYPTION_KEY}
