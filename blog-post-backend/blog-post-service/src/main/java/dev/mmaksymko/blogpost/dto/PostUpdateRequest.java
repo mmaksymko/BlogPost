@@ -1,6 +1,8 @@
 package dev.mmaksymko.blogpost.dto;
 
+import org.springframework.lang.NonNull;
+
 public record PostUpdateRequest(
-        String title,
-        String content
+    @NonNull String title,
+    @NonNull String content
 ) {}
