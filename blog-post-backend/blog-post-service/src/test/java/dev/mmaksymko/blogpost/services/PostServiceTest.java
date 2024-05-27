@@ -67,8 +67,9 @@ public class PostServiceTest {
 
             assertEquals(1, result.getContent().size());
             assertEquals(postResponse, result.getContent().get(0));
-            verify(postRepository).findAll(pageable);
-            verify(postMapper).toResponse(post);
+
+            verify(postRepository, times(1)).findAll(pageable);
+            verify(postMapper, times(1)).toResponse(post);
         }
 
         @Test
@@ -79,7 +80,8 @@ public class PostServiceTest {
             Page<PostResponse> result = postService.getPosts(pageable);
 
             assertEquals(0, result.getContent().size());
-            verify(postRepository).findAll(pageable);
+
+            verify(postRepository, times(1)).findAll(pageable);
         }
     }
 
@@ -95,8 +97,9 @@ public class PostServiceTest {
             PostResponse result = postService.getPost(id);
 
             assertEquals(postResponse, result);
-            verify(postRepository).findById(id);
-            verify(postMapper).toResponse(post);
+
+            verify(postRepository, times(1)).findById(id);
+            verify(postMapper, times(1)).toResponse(post);
         }
 
         @Test
@@ -107,7 +110,8 @@ public class PostServiceTest {
             when(postRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> postService.getPost(testId));
-            verify(postRepository).findById(testId);
+
+            verify(postRepository, times(1)).findById(testId);
         }
     }
 
@@ -123,9 +127,10 @@ public class PostServiceTest {
             PostResponse result = postService.addPost(postRequest);
 
             assertEquals(postResponse, result);
-            verify(postMapper).toEntity(postRequest);
-            verify(postRepository).save(post);
-            verify(postMapper).toResponse(post);
+
+            verify(postMapper, times(1)).toEntity(postRequest);
+            verify(postRepository, times(1)).save(post);
+            verify(postMapper, times(1)).toResponse(post);
         }
     }
 
@@ -143,9 +148,9 @@ public class PostServiceTest {
             PostResponse result = postService.updatePost(id, postUpdateRequest);
 
             assertEquals(postResponse, result);
-            verify(postRepository).findById(id);
-            verify(postRepository).save(post);
-            verify(postMapper).toResponse(post);
+            verify(postRepository, times(1)).findById(id);
+            verify(postRepository, times(1)).save(post);
+            verify(postMapper, times(1)).toResponse(post);
         }
 
         @Test
@@ -156,7 +161,8 @@ public class PostServiceTest {
             when(postRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> postService.updatePost(id, postUpdateRequest));
-            verify(postRepository).findById(id);
+
+            verify(postRepository, times(1)).findById(id);
         }
     }
 
@@ -169,6 +175,6 @@ public class PostServiceTest {
 
         postService.deletePost(id);
 
-        verify(postRepository).deleteById(id);
+        verify(postRepository, times(1)).deleteById(id);
     }
 }
