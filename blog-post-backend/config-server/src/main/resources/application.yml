@@ -9,9 +9,18 @@ spring:
           default-label: main
           uri: https://github.com/mmaksymko/blogpost-config
 
-server:
-  port:
-    8071
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
 
 encrypt:
   key: ${BLOGPOST_ENCRYPTION_KEY}
+
+server:
+  port:
+    8071
