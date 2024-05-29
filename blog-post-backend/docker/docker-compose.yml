@@ -29,7 +29,7 @@ services:
     ports:
       - "8071:8071"
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8070/eureka/
+      SPRING_PROFILES_ACTIVE: prod
       BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
     networks:
       backend:
@@ -43,8 +43,7 @@ services:
     ports:
       - "8070:8070"
     environment:
-      EUREKA_INSTANCE_HOSTNAME: discovery-server
-      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8071
+      SPRING_PROFILES_ACTIVE: prod
     depends_on:
       database:
         condition: service_healthy
@@ -60,13 +59,12 @@ services:
       dockerfile: Dockerfile
     image: mmaksymko/blog-post-gateway-server:latest
     environment:
-      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8071
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8070/eureka/
+      SPRING_PROFILES_ACTIVE: prod
     depends_on:
       config-server:
         condition: service_started
       discovery-server:
-       condition: service_started 
+        condition: service_started
     ports:
       - "8080:8080"
     networks:
@@ -79,12 +77,8 @@ services:
       dockerfile: Dockerfile
     image: mmaksymko/blog-post-post-service:latest
     environment:
-      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8071
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8070/eureka/
+      SPRING_PROFILES_ACTIVE: prod
       BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/blog_post
-      CONFIGSERVER_PORT:   "8071"
-      DATABASESERVER_PORT: "5432"
     depends_on:
       database:
         condition: service_healthy
@@ -102,12 +96,8 @@ services:
       dockerfile: Dockerfile
     image: mmaksymko/blog-post-comments-service:latest
     environment:
-      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8071
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8070/eureka/
+      SPRING_PROFILES_ACTIVE: prod
       BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/blog_post_comment
-      CONFIGSERVER_PORT:   "8071"
-      DATABASESERVER_PORT: "5432"
     depends_on:
       database:
         condition: service_healthy
