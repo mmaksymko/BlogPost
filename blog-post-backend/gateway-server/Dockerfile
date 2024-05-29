@@ -11,7 +11,7 @@ ENV HOME=/usr/app
 RUN mkdir -p $HOME
 WORKDIR $HOME
 ADD . $HOME
-#ADD src/main/resources/GeoLite2-Country.mmdb $HOME/src/main/resources/GeoLite2-Country.mmdb
+ADD src/main/resources/GeoLite2-Country.mmdb $HOME/src/main/resources/GeoLite2-Country.mmdb
 RUN --mount=type=cache,target=/root/.m2 ./mvnw -f $HOME/pom.xml clean package -Dmaven.test.skip=true
 
 #
