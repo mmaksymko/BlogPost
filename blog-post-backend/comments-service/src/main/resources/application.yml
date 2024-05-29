@@ -2,5 +2,5 @@ spring:
   application:
     name:
       comments-service
-  config:
-    import: optional:configserver:http://localhost:8071
+  profiles:
+    active: dev
