@@ -3,4 +3,4 @@ spring:
     name:
       blog-post-service
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
