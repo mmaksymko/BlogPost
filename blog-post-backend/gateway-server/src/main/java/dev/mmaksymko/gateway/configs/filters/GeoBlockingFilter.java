@@ -41,7 +41,7 @@ public class GeoBlockingFilter implements GlobalFilter {
             return exchange.getResponse().setComplete();
         }
 
-        return chain.filter(exchange).or(Mono.empty());
+        return chain.filter(exchange);
     }
 
     boolean isBlocked(String ip) {
@@ -54,7 +54,6 @@ public class GeoBlockingFilter implements GlobalFilter {
             String country = response.getCountry().getIsoCode();
             return geoLite2Properties.blockedCountries().stream().anyMatch(country::equalsIgnoreCase);
         } catch (IOException | GeoIp2Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
