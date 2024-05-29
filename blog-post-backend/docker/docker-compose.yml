@@ -1,0 +1,128 @@
+version: 2.7.0
+services:
+  database:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: "blog_db"
+    volumes:
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/1-init.sql
+      - db-data:/var/lib/postgresql/data
+    networks:
+      backend:
+        aliases:
+          - "database"
+          - "postgres"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  config-server:
+    build:
+      context: ../config-server
+      dockerfile: Dockerfile
+    image: mmaksymko/blog-post-config-server:latest
+    ports:
+      - "8071:8071"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8070/eureka/
+      BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
+    networks:
+      backend:
+        aliases:
+          - "config-server"
+  discovery-server:
+    build:
+      context: ../discovery-server
+      dockerfile: Dockerfile
+    image: mmaksymko/blog-post-discovery-server:latest
+    ports:
+      - "8070:8070"
+    environment:
+      EUREKA_INSTANCE_HOSTNAME: discovery-server
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8071
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started  
+    networks:
+      backend:
+        aliases:
+          - "discovery-server"
+  gateway-server:
+    build:
+      context: ../gateway-server
+      dockerfile: Dockerfile
+    image: mmaksymko/blog-post-gateway-server:latest
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8071
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8070/eureka/
+    depends_on:
+      config-server:
+        condition: service_started
+      discovery-server:
+       condition: service_started 
+    ports:
+      - "8080:8080"
+    networks:
+      backend:
+        aliases:
+          - "gateway-server"
+  blog-post-service:
+    build:
+      context: ../blog-post-service
+      dockerfile: Dockerfile
+    image: mmaksymko/blog-post-post-service:latest
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8071
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8070/eureka/
+      BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/blog_post
+      CONFIGSERVER_PORT:   "8071"
+      DATABASESERVER_PORT: "5432"
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+    ports:
+      - "8081:8081"
+    networks:
+      backend:
+        aliases:
+          - "blog-post-service"
+  comments-service:
+    build:
+      context: ../comments-service
+      dockerfile: Dockerfile
+    image: mmaksymko/blog-post-comments-service:latest
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8071
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8070/eureka/
+      BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/blog_post_comment
+      CONFIGSERVER_PORT:   "8071"
+      DATABASESERVER_PORT: "5432"
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+    ports:
+      - "8082:8082"
+    networks:
+      backend:
+        aliases:
+          - "comments-service"
+  
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  db-data:
