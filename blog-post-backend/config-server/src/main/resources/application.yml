@@ -10,7 +10,7 @@ spring:
           uri: https://github.com/mmaksymko/blogpost-config
           search-paths: '{application}'
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
 eureka:
   instance:
@@ -18,9 +18,11 @@ eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
 
 encrypt:
-  key: ${BLOGPOST_ENCRYPTION_KEY}
+  key: ${BLOGPOST_ENCRYPTION_KEY:encryption-key}
 
 server:
   port:
