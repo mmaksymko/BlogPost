@@ -3,4 +3,4 @@ spring:
     name:
       gateway-server
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
