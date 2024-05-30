@@ -7,9 +7,12 @@ import dev.mmaksymko.reactions.mappers.CommentReactionMapper;
 import dev.mmaksymko.reactions.models.Comment;
 import dev.mmaksymko.reactions.models.CommentReaction;
 import dev.mmaksymko.reactions.repositories.CommentReactionRepository;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +47,10 @@ public class CommentReactionService {
         return commentReactionMapper.toResponse(reaction);
     }
 
+    @Transactional
+    @Modifying
+    @Retry(name = "retry-reaction")
+    @RateLimiter(name = "rate-limit-reaction")
     public CommentReactionResponse addCommentReaction(CommentReactionRequest request) {
         Comment comment = commentClient.getComment(request.commentId());
 
@@ -54,6 +61,10 @@ public class CommentReactionService {
         return commentReactionMapper.toResponse(savedReaction);
     }
 
+    @Transactional
+    @Modifying
+    @Retry(name = "retry-reaction")
+    @RateLimiter(name = "rate-limit-reaction")
     public CommentReactionResponse updateCommentReaction(CommentReactionRequest request) {
         var reactionId = CommentReaction
                 .CommentReactionId
@@ -71,6 +82,10 @@ public class CommentReactionService {
         return commentReactionMapper.toResponse(savedReaction);
     }
 
+    @Transactional
+    @Modifying
+    @Retry(name = "retry-reaction")
+    @RateLimiter(name = "rate-limit-reaction")
     public void deleteCommentReaction(Long commentId, Long userId) {
         var reactionId = CommentReaction
                 .CommentReactionId

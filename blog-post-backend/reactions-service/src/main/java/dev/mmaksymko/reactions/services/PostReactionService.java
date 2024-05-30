@@ -1,19 +1,20 @@
 package dev.mmaksymko.reactions.services;
 
 import dev.mmaksymko.reactions.clients.PostClient;
-import dev.mmaksymko.reactions.dto.CommentReactionResponse;
 import dev.mmaksymko.reactions.dto.PostReactionRequest;
 import dev.mmaksymko.reactions.dto.PostReactionResponse;
 import dev.mmaksymko.reactions.mappers.PostReactionMapper;
 import dev.mmaksymko.reactions.models.Post;
 import dev.mmaksymko.reactions.models.PostReaction;
 import dev.mmaksymko.reactions.repositories.PostReactionRepository;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Map;
 
@@ -46,6 +47,10 @@ public class PostReactionService {
         return postReactionMapper.toResponse(reaction);
     }
 
+    @Transactional
+    @Modifying
+    @Retry(name = "retry-reaction")
+    @RateLimiter(name = "rate-limit-reaction")
     public PostReactionResponse addPostReaction(PostReactionRequest request) {
         Post post = postClient.getPost(request.postId());
 
@@ -56,6 +61,10 @@ public class PostReactionService {
         return postReactionMapper.toResponse(savedReaction);
     }
 
+    @Transactional
+    @Modifying
+    @Retry(name = "retry-reaction")
+    @RateLimiter(name = "rate-limit-reaction")
     public PostReactionResponse updatePostReaction(PostReactionRequest request) {
         var reactionId = PostReaction
                 .PostReactionId
@@ -73,6 +82,10 @@ public class PostReactionService {
         return postReactionMapper.toResponse(savedReaction);
     }
 
+    @Transactional
+    @Modifying
+    @Retry(name = "retry-reaction")
+    @RateLimiter(name = "rate-limit-reaction")
     public void deletePostReaction(Long commentId, Long userId) {
         var reactionId = PostReaction
                 .PostReactionId
