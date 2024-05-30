@@ -1,8 +1,6 @@
 package dev.mmaksymko.comments.controllers;
 
-import dev.mmaksymko.comments.dto.CommentRequest;
-import dev.mmaksymko.comments.dto.CommentResponse;
-import dev.mmaksymko.comments.dto.CommentUpdateRequest;
+import dev.mmaksymko.comments.dto.*;
 import dev.mmaksymko.comments.services.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +24,11 @@ public class CommentController {
     @GetMapping("{id}/")
     public CommentResponse getComment(@PathVariable Long id) {
         return commentService.getComment(id);
+    }
+
+    @GetMapping("{id}/base/")
+    public BaseCommentResponse getCommentByItself(@PathVariable Long id) {
+        return commentService.getCommentByItself(id);
     }
 
     @PostMapping

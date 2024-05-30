@@ -2,6 +2,7 @@ package dev.mmaksymko.comments.services;
 
 import dev.mmaksymko.comments.clients.PostClient;
 import dev.mmaksymko.comments.configs.exceptions.ResourceGoneException;
+import dev.mmaksymko.comments.dto.BaseCommentResponse;
 import dev.mmaksymko.comments.dto.CommentRequest;
 import dev.mmaksymko.comments.dto.CommentResponse;
 import dev.mmaksymko.comments.dto.CommentUpdateRequest;
@@ -60,6 +61,10 @@ public class CommentService {
 
     public CommentResponse getComment(Long id) {
         return commentRepository.findById(id).map(commentMapper::toResponse).orElseThrow();
+    }
+
+    public BaseCommentResponse getCommentByItself(Long id) {
+        return commentRepository.findById(id).map(commentMapper::toBaseCommentResponse).orElseThrow();
     }
 
     @Transactional
