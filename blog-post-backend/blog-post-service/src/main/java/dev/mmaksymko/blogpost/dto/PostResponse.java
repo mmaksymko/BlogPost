@@ -17,4 +17,12 @@ public class PostResponse {
     private String content;
     private Long authorId;
     private LocalDateTime postedAt;
-};
+
+    public PostResponse(PostResponse postResponse) {
+        this.id = postResponse.id;
+        this.title = postResponse.title;
+        this.content = postResponse.content;
+        this.authorId = postResponse.authorId;
+        this.postedAt = postResponse.postedAt;
+    }
+}
