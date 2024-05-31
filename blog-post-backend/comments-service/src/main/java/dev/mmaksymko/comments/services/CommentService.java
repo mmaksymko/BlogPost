@@ -10,6 +10,7 @@ import dev.mmaksymko.comments.mappers.CommentMapper;
 import dev.mmaksymko.comments.models.Comment;
 import dev.mmaksymko.comments.models.Post;
 import dev.mmaksymko.comments.repositories.CommentRepository;
+import dev.mmaksymko.comments.services.kafka.CommentProducer;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -27,6 +28,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final PostClient postClient;
+    private final CommentProducer commentProducer;
 
     public Page<CommentResponse> getComments(Long postId, Pageable pageable) {
         Page<Comment> comments;
@@ -38,6 +40,14 @@ public class CommentService {
         }
 
         return comments.map(commentMapper::toResponse);
+    }
+
+    public CommentResponse getComment(Long id) {
+        return commentRepository.findById(id).map(commentMapper::toResponse).orElseThrow();
+    }
+
+    public BaseCommentResponse getCommentByItself(Long id) {
+        return commentRepository.findById(id).map(commentMapper::toBaseCommentResponse).orElseThrow();
     }
 
     @Transactional
@@ -56,15 +66,10 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(comment);
 
-        return commentMapper.toResponse(savedComment);
-    }
+        CommentResponse commentResponse = commentMapper.toResponse(savedComment);
+        commentProducer.sendCreatedEvent(commentResponse);
 
-    public CommentResponse getComment(Long id) {
-        return commentRepository.findById(id).map(commentMapper::toResponse).orElseThrow();
-    }
-
-    public BaseCommentResponse getCommentByItself(Long id) {
-        return commentRepository.findById(id).map(commentMapper::toBaseCommentResponse).orElseThrow();
+        return commentResponse;
     }
 
     @Transactional
@@ -83,7 +88,10 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(retrievedComment);
 
-        return commentMapper.toResponse(savedComment);
+        CommentResponse commentResponse = commentMapper.toResponse(savedComment);
+        commentProducer.sendUpdatedEvent(commentResponse);
+
+        return commentResponse;
     }
 
     @Transactional
@@ -96,5 +104,11 @@ public class CommentService {
         }
 
         retrievedComment.setIsDeleted(true);
+
+        commentRepository.save(retrievedComment);
+
+        CommentResponse commentResponse = commentMapper.toResponse(retrievedComment);
+
+        commentProducer.sendDeletedEvent(commentResponse);
     }
 }
