@@ -1,16 +1,22 @@
 package dev.mmaksymko.reactions.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Builder
-public record Comment(
-    Long commentId,
-    Long postId,
-    Long userId,
-    String content,
-    Boolean isDeleted,
-    Boolean isModified,
-    LocalDateTime commentedAt
-) {}
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Comment {
+    private Long commentId;
+    private Long postId;
+    private Long userId;
+    private String content;
+    private Boolean isDeleted;
+    private Boolean isModified;
+    private LocalDateTime commentedAt;
+}
