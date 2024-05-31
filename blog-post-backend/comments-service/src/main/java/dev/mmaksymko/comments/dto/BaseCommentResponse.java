@@ -19,4 +19,14 @@ public class BaseCommentResponse {
     private Boolean isDeleted;
     private Boolean isModified;
     private LocalDateTime commentedAt;
+
+    public BaseCommentResponse(BaseCommentResponse commentResponse) {
+        this.commentId = commentResponse.getCommentId();
+        this.postId = commentResponse.getPostId();
+        this.userId = commentResponse.getUserId();
+        this.content = commentResponse.getContent();
+        this.isDeleted = commentResponse.getIsDeleted();
+        this.isModified = commentResponse.getIsModified();
+        this.commentedAt = commentResponse.getCommentedAt();
+    }
 }
