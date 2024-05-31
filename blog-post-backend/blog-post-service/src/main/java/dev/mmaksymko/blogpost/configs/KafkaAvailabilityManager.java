@@ -1,6 +1,7 @@
 package dev.mmaksymko.blogpost.configs;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.Node;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaAdmin;
@@ -12,29 +13,38 @@ import java.util.concurrent.*;
 @Configuration
 public class KafkaAvailabilityManager {
     private final Properties properties;
+    private AdminClient adminClient;
 
     public KafkaAvailabilityManager(KafkaAdmin kafkaAdmin) {
         properties = new Properties();
         properties.putAll(kafkaAdmin.getConfigurationProperties());
     }
 
-    public boolean isAvailable() {
-        Callable<AdminClient> task = () -> AdminClient.create(properties);
-        FutureTask<AdminClient> futureTask = new FutureTask<>(task);
-        AdminClient adminClient = null;
+    public AdminClient getAdminClient() throws KafkaException {
+        if (adminClient != null) {
+            return adminClient;
+        }
+        FutureTask<AdminClient> futureTask = new FutureTask<>(() -> AdminClient.create(properties));
         try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
             executorService.execute(futureTask);
-            adminClient = futureTask.get(1, TimeUnit.SECONDS);
+            AdminClient adminClient = futureTask.get(1, TimeUnit.SECONDS);
+            if (adminClient == null) {
+                throw new KafkaException();
+            }
+            this.adminClient = adminClient;
+            return adminClient;
         } catch (TimeoutException e) {
             futureTask.cancel(true);
+            throw new KafkaException();
         } catch (Exception e) {
-            return false;
+            throw new KafkaException();
         }
-        if (adminClient == null) {
-            return false;
-        }
+    }
+
+    public boolean isAvailable() {
         try {
-            Collection<Node> nodes = adminClient.describeCluster().nodes().get();
+            AdminClient admin = getAdminClient();
+            Collection<Node> nodes = admin.describeCluster().nodes().get();
             return nodes != null && !nodes.isEmpty();
         } catch (Exception e) {
             return false;
