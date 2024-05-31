@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS blog_post;
+CREATE DATABASE blog_post;
 
 \c blog_post;
 
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS post (
 );
 CREATE INDEX IF NOT EXISTS idx_post_user ON post (user_id);
 
-CREATE DATABASE IF NOT EXISTS  blog_post_comment;
+CREATE DATABASE blog_post_comment;
 
 \c blog_post_comment;
 
@@ -29,18 +29,18 @@ CREATE INDEX IF NOT EXISTS idx_comment_user ON comment (user_id);
 CREATE INDEX IF NOT EXISTS idx_comment_parent_comment ON comment (parent_comment_id);
 
 
-CREATE DATABASE IF NOT EXISTS reaction;
-\c reaction
+CREATE DATABASE reaction;
+\c reaction;
 
 CREATE TABLE IF NOT EXISTS reaction_type (
-	reaction_type_id SERIAL NOT NULL,
-	name text not null
+	reaction_type_id SERIAL primary key NOT NULL,
+	name text unique not null
 );
 
 CREATE TABLE IF NOT EXISTS post_reaction (
     post_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
-	reaction_type_id int references reaction_type(reaction_type_id),
+	reaction_type_id bigint not null references reaction_type(reaction_type_id),
 	primary key(post_id, user_id)
 );
 CREATE INDEX IF NOT EXISTS idx_post_reaction_user ON post_reaction (user_id);
@@ -54,11 +54,11 @@ CREATE TABLE IF NOT EXISTS comment_reaction(
 	primary key(comment_id, user_id)
 );
 CREATE INDEX IF NOT EXISTS idx_comment_reaction_user ON comment_reaction (user_id);
-CREATE INDEX IF NOT EXISTS idx_comment_reaction_post ON comment_reaction (post_id);
-CREATE INDEX IF NOT EXISTS idx_post_reaction_type ON comment_reaction (reaction_type_id);
+CREATE INDEX IF NOT EXISTS idx_comment_reaction_comment ON comment_reaction (comment_id);
+CREATE INDEX IF NOT EXISTS idx_comment_reaction_type ON comment_reaction (reaction_type_id);
 
 CREATE DATABASE user_db;
-\c like_db
+\c user_db;
 
 CREATE DOMAIN USER_ROLE_DOMAIN AS TEXT
-CHECK (VALUE IN ('USER', 'ADMIN'))
+CHECK (VALUE IN ('USER', 'ADMIN'));
