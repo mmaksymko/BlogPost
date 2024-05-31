@@ -6,6 +6,7 @@ import dev.mmaksymko.blogpost.dto.PostUpdateRequest;
 import dev.mmaksymko.blogpost.mappers.PostMapper;
 import dev.mmaksymko.blogpost.models.Post;
 import dev.mmaksymko.blogpost.repositories.PostRepository;
+import dev.mmaksymko.blogpost.services.kafka.PostProducer;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
+    private final PostProducer postProducer;
 
     public Page<PostResponse> getPosts(Pageable pageable) {
         return postRepository.findAll(pageable).map(postMapper::toResponse);
@@ -41,7 +43,11 @@ public class PostService {
 
         Post savedPost = postRepository.save(post);
 
-        return postMapper.toResponse(savedPost);
+        PostResponse postResponse = postMapper.toResponse(savedPost);
+
+        postProducer.sendCreatedEvent(postResponse);
+
+        return postResponse;
     }
 
     @Transactional
@@ -56,12 +62,20 @@ public class PostService {
 
         Post savedPost = postRepository.save(retrievedPost);
 
-        return postMapper.toResponse(savedPost);
+        PostResponse postResponse = postMapper.toResponse(savedPost);
+
+        postProducer.sendUpdatedEvent(postResponse);
+
+        return postResponse;
     }
 
     @Transactional
     @Modifying
     public void deletePost(Long id) {
         postRepository.deleteById(id);
+
+        PostResponse postResponse = PostResponse.builder().id(id).build();
+
+        postProducer.sendDeletedEvent(postResponse);
     }
 }
