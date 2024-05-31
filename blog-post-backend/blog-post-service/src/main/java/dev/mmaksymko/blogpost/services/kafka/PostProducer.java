@@ -26,7 +26,6 @@ public class PostProducer {
         }
         try {
             String eventAsString = objectMapper.writeValueAsString(event);
-            System.out.println("Sending message: " + eventAsString);
             kafkaTemplate.send(topic, eventAsString);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
