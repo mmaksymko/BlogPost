@@ -84,6 +84,8 @@ services:
         condition: service_healthy
       config-server:
         condition: service_started
+      kafka:
+        condition: service_started
     ports:
       - "8081:8081"
     networks:
@@ -103,6 +105,8 @@ services:
         condition: service_healthy
       config-server:
         condition: service_started
+      kafka:
+        condition: service_started
     ports:
       - "8082:8082"
     networks:
@@ -121,6 +125,8 @@ services:
       database:
         condition: service_healthy
       config-server:
+        condition: service_started
+      kafka:
         condition: service_started
     ports:
       - "8083:8083"
