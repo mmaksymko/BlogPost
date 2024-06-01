@@ -1,4 +1,4 @@
-package dev.mmaksymko.reactions.repositories;
+package dev.mmaksymko.reactions.repositories.jpa;
 
 import dev.mmaksymko.reactions.models.ReactionType;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package dev.mmaksymko.reactions.repositories;
+package dev.mmaksymko.reactions.repositories.jpa;
 
 import dev.mmaksymko.reactions.dto.ReactionCount;
 import dev.mmaksymko.reactions.models.CommentReaction;
