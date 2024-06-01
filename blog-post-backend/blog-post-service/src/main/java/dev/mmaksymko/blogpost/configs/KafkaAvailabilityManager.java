@@ -1,5 +1,6 @@
 package dev.mmaksymko.blogpost.configs;
 
+
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.Node;
@@ -13,7 +14,6 @@ import java.util.concurrent.*;
 @Configuration
 public class KafkaAvailabilityManager {
     private final Properties properties;
-    private AdminClient adminClient;
 
     public KafkaAvailabilityManager(KafkaAdmin kafkaAdmin) {
         properties = new Properties();
@@ -21,9 +21,6 @@ public class KafkaAvailabilityManager {
     }
 
     public AdminClient getAdminClient() throws KafkaException {
-        if (adminClient != null) {
-            return adminClient;
-        }
         FutureTask<AdminClient> futureTask = new FutureTask<>(() -> AdminClient.create(properties));
         try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
             executorService.execute(futureTask);
@@ -31,7 +28,6 @@ public class KafkaAvailabilityManager {
             if (adminClient == null) {
                 throw new KafkaException();
             }
-            this.adminClient = adminClient;
             return adminClient;
         } catch (TimeoutException e) {
             futureTask.cancel(true);

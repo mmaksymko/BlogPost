@@ -19,7 +19,6 @@ public class PostProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final KafkaAvailabilityManager kafkaAvailabilityManager;
 
-    @Async
     public void sendMessage(String topic, PostEvent event) {
         if (!kafkaAvailabilityManager.isAvailable()) {
             return;
@@ -32,16 +31,19 @@ public class PostProducer {
         }
     }
 
+    @Async
     public void sendCreatedEvent(PostResponse post) {
         PostEvent event = new PostEvent(post, EventType.CREATED);
         sendMessage(TOPIC, event);
     }
 
+    @Async
     public void sendUpdatedEvent(PostResponse post) {
         PostEvent event = new PostEvent(post, EventType.UPDATED);
         sendMessage(TOPIC, event);
     }
 
+    @Async
     public void sendDeletedEvent(PostResponse post) {
         PostEvent event = new PostEvent(post, EventType.DELETED);
         sendMessage(TOPIC, event);
