@@ -4,7 +4,7 @@ import dev.mmaksymko.reactions.dto.ReactionTypeRequest;
 import dev.mmaksymko.reactions.dto.ReactionTypeResponse;
 import dev.mmaksymko.reactions.mappers.ReactionTypeMapper;
 import dev.mmaksymko.reactions.models.ReactionType;
-import dev.mmaksymko.reactions.repositories.ReactionTypeRepository;
+import dev.mmaksymko.reactions.repositories.jpa.ReactionTypeRepository;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
