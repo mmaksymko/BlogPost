@@ -47,7 +47,7 @@ public class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        commentService = new CommentService(commentRepository, commentMapper, postClient, null);
+        commentService = new CommentService(commentRepository, commentMapper, postClient, null, null);
 
         comment = new Comment();
         baseCommentResponse = new BaseCommentResponse();
