@@ -78,7 +78,8 @@ services:
     image: mmaksymko/blog-post-post-service:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       database:
         condition: service_healthy
@@ -99,7 +100,9 @@ services:
     image: mmaksymko/blog-post-comments-service:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       database:
         condition: service_healthy
@@ -120,7 +123,9 @@ services:
     image: mmaksymko/blog-post-reactions-service:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       database:
         condition: service_healthy
