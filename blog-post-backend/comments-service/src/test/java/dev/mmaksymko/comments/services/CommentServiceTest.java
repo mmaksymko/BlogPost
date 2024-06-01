@@ -9,7 +9,7 @@ import dev.mmaksymko.comments.dto.CommentUpdateRequest;
 import dev.mmaksymko.comments.mappers.CommentMapper;
 import dev.mmaksymko.comments.models.Comment;
 import dev.mmaksymko.comments.models.Post;
-import dev.mmaksymko.comments.repositories.CommentRepository;
+import dev.mmaksymko.comments.repositories.jpa.CommentRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -47,7 +47,7 @@ public class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        commentService = new CommentService(commentRepository, commentMapper, postClient);
+        commentService = new CommentService(commentRepository, commentMapper, postClient, null);
 
         comment = new Comment();
         baseCommentResponse = new BaseCommentResponse();
