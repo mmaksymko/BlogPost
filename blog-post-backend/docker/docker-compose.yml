@@ -30,7 +30,7 @@ services:
       - "8071:8071"
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      BLOGPOST_ENCRYPTION_KEY: ${BLOGPOST_ENCRYPTION_KEY}
+      ENCRYPT_ENABLED: false
     networks:
       backend:
         aliases:
