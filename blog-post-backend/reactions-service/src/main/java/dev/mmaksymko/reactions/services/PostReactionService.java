@@ -8,7 +8,8 @@ import dev.mmaksymko.reactions.mappers.PostReactionMapper;
 import dev.mmaksymko.reactions.models.Post;
 import dev.mmaksymko.reactions.models.PostReaction;
 import dev.mmaksymko.reactions.models.ReactionType;
-import dev.mmaksymko.reactions.repositories.PostReactionRepository;
+import dev.mmaksymko.reactions.repositories.jpa.PostReactionRepository;
+import dev.mmaksymko.reactions.services.redis.RedisPostService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ public class PostReactionService {
     private final PostReactionMapper postReactionMapper;
     private final PostClient postClient;
     private final ReactionTypeService reactionTypeService;
+    private final RedisPostService redisPostService;
 
     public Page<PostReactionResponse> getPostReactions(Long commentId, Pageable pageable) {
         return postReactionRepository.findAllByIdPostId(commentId, pageable).map(postReactionMapper::toResponse);
@@ -69,7 +71,7 @@ public class PostReactionService {
     @Retry(name = "retry-reaction")
     @RateLimiter(name = "rate-limit-reaction")
     public PostReactionResponse addPostReaction(PostReactionRequest request) {
-        Post post = postClient.getPost(request.postId());
+        Post post = getPost(request.postId());
 
         PostReaction reaction = postReactionMapper.toEntity(request);
 
@@ -112,5 +114,14 @@ public class PostReactionService {
                 .build();
 
         postReactionRepository.deleteById(reactionId);
+    }
+
+    private Post getPost(Long id) {
+        Post post = redisPostService.getPost(id);
+        if (post == null) {
+            post = postClient.getPost(id);
+            redisPostService.savePost(post);
+        }
+        return post;
     }
 }

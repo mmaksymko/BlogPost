@@ -8,7 +8,8 @@ import dev.mmaksymko.reactions.mappers.CommentReactionMapper;
 import dev.mmaksymko.reactions.models.Comment;
 import dev.mmaksymko.reactions.models.CommentReaction;
 import dev.mmaksymko.reactions.models.ReactionType;
-import dev.mmaksymko.reactions.repositories.CommentReactionRepository;
+import dev.mmaksymko.reactions.repositories.jpa.CommentReactionRepository;
+import dev.mmaksymko.reactions.services.redis.RedisCommentService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ public class CommentReactionService {
     private final CommentReactionMapper commentReactionMapper;
     private final CommentClient commentClient;
     private final ReactionTypeService reactionTypeService;
+    private final RedisCommentService redisCommentService;
 
     public Page<CommentReactionResponse> getCommentReactions(Long commentId, Pageable pageable) {
         return commentReactionRepository.findAllByIdCommentId(commentId, pageable).map(commentReactionMapper::toResponse);
@@ -110,5 +112,14 @@ public class CommentReactionService {
                 .build();
 
         commentReactionRepository.deleteById(reactionId);
+    }
+
+    private Comment getComment(Long id) {
+        Comment comment = redisCommentService.getComment(id);
+        if (comment == null) {
+            comment = commentClient.getComment(id);
+            redisCommentService.saveComment(comment);
+        }
+        return comment;
     }
 }
