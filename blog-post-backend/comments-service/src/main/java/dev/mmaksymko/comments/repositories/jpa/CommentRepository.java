@@ -1,4 +1,4 @@
-package dev.mmaksymko.comments.repositories;
+package dev.mmaksymko.comments.repositories.jpa;
 
 import dev.mmaksymko.comments.models.Comment;
 import org.springframework.data.domain.Page;
