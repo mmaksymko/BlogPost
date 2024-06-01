@@ -9,8 +9,9 @@ import dev.mmaksymko.comments.dto.CommentUpdateRequest;
 import dev.mmaksymko.comments.mappers.CommentMapper;
 import dev.mmaksymko.comments.models.Comment;
 import dev.mmaksymko.comments.models.Post;
-import dev.mmaksymko.comments.repositories.CommentRepository;
+import dev.mmaksymko.comments.repositories.jpa.CommentRepository;
 import dev.mmaksymko.comments.services.kafka.CommentProducer;
+import dev.mmaksymko.comments.services.redis.RedisPostService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -29,6 +30,7 @@ public class CommentService {
     private final CommentMapper commentMapper;
     private final PostClient postClient;
     private final CommentProducer commentProducer;
+    private final RedisPostService redisPostService;
 
     public Page<CommentResponse> getComments(Long postId, Pageable pageable) {
         Page<Comment> comments;
@@ -56,7 +58,7 @@ public class CommentService {
     @Retry(name = "retry-comment")
     @RateLimiter(name = "rate-limit-comment")
     public CommentResponse addComment(CommentRequest request) {
-        Post post = postClient.getPost(request.postId());
+        Post post = getPost(request.postId());
 
         Comment parentComment = request.parentCommentId() != null
                 ? commentRepository.findById(request.parentCommentId()).orElseThrow()
@@ -110,5 +112,14 @@ public class CommentService {
         CommentResponse commentResponse = commentMapper.toResponse(retrievedComment);
 
         commentProducer.sendDeletedEvent(commentResponse);
+    }
+
+    private Post getPost(Long id) {
+        Post post = redisPostService.getPost(id);
+        if (post == null) {
+            post = postClient.getPost(id);
+            redisPostService.savePost(post);
+        }
+        return post;
     }
 }
