@@ -2,7 +2,7 @@ package dev.mmaksymko.comments.services.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.mmaksymko.comments.configs.KafkaAvailabilityManager;
+import dev.mmaksymko.comments.configs.kafka.KafkaAvailabilityManager;
 import dev.mmaksymko.comments.dto.CommentResponse;
 import dev.mmaksymko.comments.dto.kafka.EventType;
 import dev.mmaksymko.comments.dto.kafka.CommentEvent;
@@ -19,7 +19,6 @@ public class CommentProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final KafkaAvailabilityManager kafkaAvailabilityManager;
 
-    @Async
     public void sendMessage(String topic, CommentEvent event) {
         if (!kafkaAvailabilityManager.isAvailable()) {
             return;
@@ -32,16 +31,19 @@ public class CommentProducer {
         }
     }
 
+    @Async
     public void sendCreatedEvent(CommentResponse post) {
         CommentEvent event = new CommentEvent(post, EventType.CREATED);
         sendMessage(TOPIC, event);
     }
 
+    @Async
     public void sendUpdatedEvent(CommentResponse post) {
         CommentEvent event = new CommentEvent(post, EventType.UPDATED);
         sendMessage(TOPIC, event);
     }
 
+    @Async
     public void sendDeletedEvent(CommentResponse post) {
         CommentEvent event = new CommentEvent(post, EventType.DELETED);
         sendMessage(TOPIC, event);
