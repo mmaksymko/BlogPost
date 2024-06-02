@@ -139,6 +139,24 @@ services:
       backend:
         aliases:
           - "reactions-service"
+  images-service:
+    build:
+      context: ../images-service
+      dockerfile: Dockerfile
+    image: mmaksymko/blog-post-images-service:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    depends_on:
+      config-server:
+        condition: service_started
+    ports:
+      - "8084:8084"
+    networks:
+      backend:
+        aliases:
+          - "images-service"
   kafka:
     image: bitnami/kafka:latest
     environment:
