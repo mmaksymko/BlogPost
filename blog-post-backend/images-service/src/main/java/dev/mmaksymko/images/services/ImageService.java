@@ -73,6 +73,13 @@ public class ImageService {
             boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!exists) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+                minioClient.setBucketPolicy(
+                        SetBucketPolicyArgs
+                                .builder()
+                                .bucket(bucketName)
+                                .config(getPublicPolicy(bucketName))
+                                .build()
+                );
             }
         } catch (Exception e) {
             throw new BucketCreationException("Error while creating bucket " + e);
@@ -84,5 +91,22 @@ public class ImageService {
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new IllegalArgumentException("Invalid file type. Only image files are accepted.");
         }
+    }
+
+    private String getPublicPolicy(String bucketName) {
+        return String.format("""
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "PublicRead",
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": "s3:GetObject",
+                    "Resource": "arn:aws:s3:::%s/*"
+                }
+            ]
+        }
+        """, bucketName);
     }
 }
