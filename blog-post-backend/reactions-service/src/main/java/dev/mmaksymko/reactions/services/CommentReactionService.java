@@ -10,6 +10,7 @@ import dev.mmaksymko.reactions.models.CommentReaction;
 import dev.mmaksymko.reactions.models.ReactionType;
 import dev.mmaksymko.reactions.repositories.jpa.CommentReactionRepository;
 import dev.mmaksymko.reactions.services.redis.RedisCommentService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
@@ -66,6 +67,7 @@ public class CommentReactionService {
 
     @Transactional
     @Modifying
+    @CircuitBreaker(name = "circuit-breaker-reaction")
     @Retry(name = "retry-reaction")
     @RateLimiter(name = "rate-limit-reaction")
     public CommentReactionResponse addCommentReaction(CommentReactionRequest request) {
