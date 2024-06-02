@@ -171,10 +171,25 @@ services:
       backend:
         aliases:
           - redis
-
+  minio:
+    image: docker.io/bitnami/minio:latest
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - 'minio_data:/data'
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+      - MINIO_DEFAULT_BUCKETS=post-images
+    networks:
+      backend:
+        aliases:
+          - minio
 networks:
   backend:
     driver: bridge
 
 volumes:
   db-data:
+  minio_data:
