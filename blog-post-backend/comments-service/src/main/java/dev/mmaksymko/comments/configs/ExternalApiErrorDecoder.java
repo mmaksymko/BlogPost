@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 
-public class CustomErrorDecoder implements ErrorDecoder {
+public class ExternalApiErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
