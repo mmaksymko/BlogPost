@@ -61,4 +61,20 @@ CREATE DATABASE user_db;
 \c user_db;
 
 CREATE DOMAIN USER_ROLE_DOMAIN AS TEXT
-CHECK (VALUE IN ('USER', 'ADMIN'));
+CHECK (VALUE IN ('USER', 'ADMIN', 'SUPER_ADMIN'));
+
+CREATE TABLE user (
+    user_id SERIAL PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    role USER_ROLE_DOMAIN NOT NULL,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_pfp (
+    pfp_url TEXT NOT NULL,
+    user_id INTEGER REFERENCES user(user_id) ON DELETE CASCADE,
+    PRIMARY KEY (pfp_url, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_pfp_user_id ON user_pfp (user_id);
