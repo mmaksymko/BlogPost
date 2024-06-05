@@ -6,7 +6,6 @@ import dev.mmaksymko.reactions.configs.exceptions.ExternalApiClientException;
 import dev.mmaksymko.reactions.configs.exceptions.ExternalApiServerException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;

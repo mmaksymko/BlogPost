@@ -1,4 +1,4 @@
-package dev.mmaksymko.comments.configs.kafka;
+package dev.mmaksymko.gateway.configs.kafka;
 
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;

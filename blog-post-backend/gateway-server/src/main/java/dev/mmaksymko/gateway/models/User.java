@@ -1,47 +1,34 @@
 package dev.mmaksymko.gateway.models;
 
-
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
-import org.hibernate.annotations.ColumnTransformer;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "blog_user")
-@SecondaryTable(name = "user_pfp", pkJoinColumns = @PrimaryKeyJoinColumn(name = "user_id"))
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = {"id"})
+@NoArgsConstructor
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long id;
-
-    @Column(name = "first_name", nullable = false)
     private String firstName;
-
-    @Column(name = "last_name", nullable = false)
     private String lastName;
-
-    @Email
-    @Column(name = "email", unique = true, nullable = false)
+    @Id
     private String email;
-
-    @Enumerated(EnumType.STRING)
-    @ColumnTransformer(write="?::USER_ROLE_DOMAIN")
-    @Column(columnDefinition = "USER_ROLE_DOMAIN", name = "role", nullable = false)
     private UserRole role;
-
-    @CreationTimestamp
-    @Column(name = "registered_at", updatable = false)
     private LocalDateTime registeredAt;
-
-    @Column(name = "pfp_url", table = "user_pfp")
     private String pfpUrl;
+
+    public User(User user) {
+        this.id = user.getId();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.email = user.getEmail();
+        this.role = user.getRole();
+        this.registeredAt = user.getRegisteredAt();
+        this.pfpUrl = user.getPfpUrl();
+    }
 }

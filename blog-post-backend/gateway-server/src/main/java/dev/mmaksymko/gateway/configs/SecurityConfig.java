@@ -6,7 +6,6 @@ import dev.mmaksymko.gateway.handlers.OAuth2LogoutSuccessHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -36,15 +35,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/", "/error", "/login/**", "/webjars/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/authors/**", "/languages/**", "publishers/**", "subjects/**", "works/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/authors/**", "/languages/**", "publishers/**", "subjects/**", "works/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.DELETE, "/authors/**", "/languages/**", "publishers/**", "subjects/**", "works/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/users/").hasAnyRole("ADMIN", "USER")
-                        .pathMatchers(HttpMethod.GET, "/biqquery/**", "/python/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "listings/work/{work_id}/", "ratings/work/{work_id}/", "loans/work/{work_id}/", "loans/item/{item_id}/").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/swagger-ui/**", "/authors/**", "/works/**",
-                                "/languages/**", "search/**", "publishers/**", "subjects/**", "listings/statuses/").permitAll()
+                        .pathMatchers("/error", "/login/**", "/webjars/**").permitAll()
                         .anyExchange().authenticated())
                 .oauth2Login(oauth2 -> oauth2.authenticationSuccessHandler(oAuth2LoginSuccessHandler))
                 .logout(logout -> logout.logoutSuccessHandler(OAuth2LogoutSuccessHandler))
@@ -54,7 +45,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontEndProperties.url(), frontEndProperties.url() + "/oauth2/redirect", frontEndProperties.url() + "/**"));
+        configuration.setAllowedOrigins(List.of(frontEndProperties.url(), frontEndProperties.url() + "/oauth2/redirect", frontEndProperties.url() + "/**", "*"));
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);

@@ -1,6 +1,5 @@
 package dev.mmaksymko.gateway.handlers;
 
-import dev.mmaksymko.gateway.dto.UserResponse;
 import dev.mmaksymko.gateway.models.User;
 import dev.mmaksymko.gateway.models.UserRole;
 import dev.mmaksymko.gateway.services.UserService;
@@ -32,9 +31,7 @@ public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHan
         Map<String, Object> attributes = principal.getAttributes();
         String email = attributes.getOrDefault("email", "").toString();
 
-
-        Optional<UserResponse> optionalUser = userService.getUserByEmail(email);
-        return Mono.justOrEmpty(optionalUser)
+        return userService.getUser(email)
                 .flatMap(user -> {
                     DefaultOAuth2User newUser = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority(user.getRole().name())),
                             attributes, "email");
@@ -42,23 +39,23 @@ public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHan
                             new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
                             oAuth2AuthenticationToken.getAuthorizedClientRegistrationId());
                     SecurityContextHolder.getContext().setAuthentication(securityAuth);
-                    return Mono.empty();
+                    return Mono.just(user);
                 })
                 .switchIfEmpty(Mono.defer(() -> {
                     User user = getUserFromAttributes(attributes);
                     DefaultOAuth2User newUser = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority(user.getRole().name())),
                             attributes, "email");
-                    Authentication securityAuth = new OAuth2AuthenticationToken(newUser, List.of(new SimpleGrantedAuthority(user.getRole().name())),
+                    Authentication securityAuth = new OAuth2AuthenticationToken(newUser,
+                            List.of(new SimpleGrantedAuthority(user.getRole().name())),
                             oAuth2AuthenticationToken.getAuthorizedClientRegistrationId());
                     SecurityContextHolder.getContext().setAuthentication(securityAuth);
-                    return userService.saveUser(user);
+                    return userService.createUser(user);
                 })).then();
     }
 
     public User getUserFromAttributes(Map<String, Object> attributes){
         Object pfpUrlObj = attributes.getOrDefault("picture", null);
         String pfpUrl = pfpUrlObj == null ? null : pfpUrlObj.toString().replace("s96-c", "s512-c");
-
         return User
                 .builder()
                 .email(attributes.get("email").toString())

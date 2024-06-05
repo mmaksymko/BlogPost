@@ -1,85 +1,56 @@
 package dev.mmaksymko.gateway.services;
 
-import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import dev.mmaksymko.gateway.dto.UserRequest;
-import dev.mmaksymko.gateway.dto.UserResponse;
-import dev.mmaksymko.gateway.mapper.UserMapper;
+import dev.mmaksymko.gateway.clients.UserClient;
 import dev.mmaksymko.gateway.models.User;
-import dev.mmaksymko.gateway.models.UserRole;
 import dev.mmaksymko.gateway.repositories.UserRepository;
+import dev.mmaksymko.gateway.services.kafka.UserProducer;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.Optional;
+import reactor.core.scheduler.Schedulers;
 
 @Service
-@Transactional(readOnly = true)
-@AllArgsConstructor
+@CircuitBreaker(name = "circuit-breaker-auth")
 public class UserService {
     private final UserRepository userRepository;
-//    private final AuthService authService;
-    private final UserMapper userMapper;
+    private final UserProducer userProducer;
+    private final UserClient userClient;
 
-    public User getCurrentUser() {
-        String email = getCurrentUsersEmail();
-        return getUserByEmail(email).map(userMapper::toEntity).orElseThrow();
+    public UserService(UserRepository userRepository, UserProducer userProducer, UserClient userClient) {
+        this.userProducer = userProducer;
+        this.userClient = userClient;
+        this.userRepository = userRepository;
     }
 
-    public String getCurrentUsersEmail() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
+    public Mono<User> getUser(Long userId) {
+        return userClient.getUser(userId);
     }
 
-    public UserResponse getCurrentUserResponse(){
-        return userMapper.toResponse(getCurrentUser());
+    public Mono<User> getUser(String email) {
+        return userRepository.findByEmail(email)
+                .switchIfEmpty(userClient.getUser(email)
+                .flatMap(userRepository::save))
+                .onErrorResume(e -> Mono.empty());
     }
 
-    public Optional<UserResponse> getUserById(Long userId){
-        return userRepository.findById(userId).map(userMapper::toResponse);
+    public Mono<User> createUser(User user) {
+        System.out.println("Creating user");
+        return
+                userClient.createUser(user)
+                .flatMap(userRepository::save)
+                .flatMap(u -> Mono
+                        .just(u)
+                        .doOnNext(bool -> userProducer.sendCreatedEvent(user).subscribeOn(Schedulers.boundedElastic()).subscribe())
+                        .thenReturn(u)
+                );
     }
 
-    public Optional<UserResponse> getUserByEmail(String email){
-        return userRepository.findByEmail(email).map(userMapper::toResponse);
+    public Mono<User> updateUser(User user) {
+        return createUser(user);
     }
 
-    public Slice<UserRole> getRoles(){
-        return new SliceImpl<>(List.of(UserRole.values()));
-    }
-
-    @Transactional
-    @Modifying
-    public Mono<User> saveUser(User user){
-        return Mono.fromCallable(() -> userRepository.save(user));
-    }
-
-    @Transactional
-    @Modifying
-    public UserResponse updateUser(UserRequest userRequest, Long userId){
-        User user = userRepository.findById(userId).orElseThrow();
-
-//        authService.checkEditAuthority(user);
-
-        user.setEmail(userRequest.email());
-        user.setFirstName(userRequest.firstName());
-        user.setLastName(userRequest.lastName());
-
-        return userMapper.toResponse(userRepository.save(user));
-    }
-
-
-    @Transactional
-    @Modifying
-    public void deleteById(Long userId){
-        User user = userRepository.findById(userId).orElseThrow();
-
-//        authService.checkEditAuthority(user);
-
-        userRepository.deleteById(userId);
+    public Mono<Void> deleteUser(String email) {
+        return userRepository.deleteByEmail(email);
     }
 
 }
