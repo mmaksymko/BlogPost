@@ -2,8 +2,6 @@ package dev.mmaksymko.gateway.repositories;
 
 import dev.mmaksymko.gateway.models.User;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
@@ -20,10 +18,7 @@ public class UserRepository {
                 .get(email);
     }
 
-    private static final Logger log = LoggerFactory.getLogger(UserRepository.class);
-
     public Mono<User> save(User user) {
-        System.out.println("Saving user: " + user.getEmail());
         return redisTemplate
                 .opsForValue()
                 .set(user.getEmail(), user)
@@ -33,7 +28,7 @@ public class UserRepository {
                     }
                     return Mono.just(user);
                 })
-                .doOnError(e -> log.error("Error saving user: " + user.getEmail(), e));
+                .onErrorComplete();
     }
 
     public Mono<Void> deleteByEmail(String email) {
