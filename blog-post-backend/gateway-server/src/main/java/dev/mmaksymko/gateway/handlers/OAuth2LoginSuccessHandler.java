@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Configuration;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -23,6 +24,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHandler {
     private final UserService userService;
+    private final SecurityContext securityContext;
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
@@ -32,25 +34,30 @@ public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHan
         String email = attributes.getOrDefault("email", "").toString();
 
         return userService.getUser(email)
-                .flatMap(user -> {
-                    DefaultOAuth2User newUser = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority(user.getRole().name())),
-                            attributes, "email");
-                    Authentication securityAuth = new OAuth2AuthenticationToken(newUser, List.of(new SimpleGrantedAuthority(user.getRole().name()),
-                            new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
-                            oAuth2AuthenticationToken.getAuthorizedClientRegistrationId());
-                    SecurityContextHolder.getContext().setAuthentication(securityAuth);
-                    return Mono.just(user);
-                })
-                .switchIfEmpty(Mono.defer(() -> {
-                    User user = getUserFromAttributes(attributes);
-                    DefaultOAuth2User newUser = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority(user.getRole().name())),
-                            attributes, "email");
-                    Authentication securityAuth = new OAuth2AuthenticationToken(newUser,
-                            List.of(new SimpleGrantedAuthority(user.getRole().name())),
-                            oAuth2AuthenticationToken.getAuthorizedClientRegistrationId());
-                    SecurityContextHolder.getContext().setAuthentication(securityAuth);
-                    return userService.createUser(user);
-                })).then();
+                .flatMap(user -> handleUserAuthentication(user, attributes, oAuth2AuthenticationToken))
+                .switchIfEmpty(Mono.defer(() -> userService
+                            .createUser(getUserFromAttributes(attributes))
+                            .flatMap(user -> handleUserAuthentication(user, attributes, oAuth2AuthenticationToken))
+                )).then();
+    }
+
+    public Mono<User> handleUserAuthentication(User user, Map<String, Object> attributes, OAuth2AuthenticationToken oAuth2AuthenticationToken) {
+        Map<String, Object> newAttributes = new HashMap<>(attributes);
+        newAttributes.put("id", user.getId());
+
+        DefaultOAuth2User newUser = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority(user.getRole().name())),
+                newAttributes, "email");
+
+        Authentication securityAuth = new OAuth2AuthenticationToken(newUser,
+                List.of(new SimpleGrantedAuthority(user.getRole().name()),
+                        new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
+                oAuth2AuthenticationToken.getAuthorizedClientRegistrationId());
+
+        securityContext.setAuthentication(securityAuth);
+
+        ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext));
+
+        return Mono.just(user);
     }
 
     public User getUserFromAttributes(Map<String, Object> attributes){
