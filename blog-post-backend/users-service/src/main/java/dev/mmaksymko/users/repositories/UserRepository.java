@@ -1,6 +1,6 @@
-package dev.mmaksymko.gateway.repositories;
+package dev.mmaksymko.users.repositories;
 
-import dev.mmaksymko.gateway.models.User;
+import dev.mmaksymko.users.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
