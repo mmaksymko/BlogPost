@@ -13,13 +13,11 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.Modifying;
-//import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -31,19 +29,6 @@ public class UserService {
     private final UserProducer userProducer;
     private final ImageClient imageClient;
     private static final String PPF_BUCKET = "pfp";
-
-//    public User getCurrentUser() {
-//        String email = getCurrentUsersEmail();
-//        return getUserByEmail(email).map(userMapper::toEntity).orElseThrow();
-//    }
-
-//    public String getCurrentUsersEmail() {
-//        return SecurityContextHolder.getContext().getAuthentication().getName();
-//    }
-
-//    public UserResponse getCurrentUserResponse(){
-//        return userMapper.toResponse(getCurrentUser());
-//    }
 
     public UserResponse getUserById(Long userId){
         return userRepository.findById(userId).map(userMapper::toResponse).orElseThrow();
