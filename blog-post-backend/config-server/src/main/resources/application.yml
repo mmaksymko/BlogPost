@@ -7,11 +7,16 @@ spring:
       server:
         git:
           default-label: main
-          uri: https://github.com/mmaksymko/blogpost-config
+          uri: ${GIT_CONFIG_REPO_URI:https://github.com/mmaksymko/blogpost-config}
           search-paths: '{application}'
         encrypt:
           enabled: ${ENCRYPT_ENABLED:true}
-
+  security:
+    oauth2:
+      client:
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
