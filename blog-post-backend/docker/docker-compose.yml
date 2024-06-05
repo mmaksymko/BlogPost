@@ -1,4 +1,4 @@
-version: 2.7.0
+version: 3.8.0
 services:
   database:
     image: postgres:latest
@@ -35,6 +35,11 @@ services:
       backend:
         aliases:
           - "config-server"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8071/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
   discovery-server:
     build:
       context: ../discovery-server
@@ -48,7 +53,7 @@ services:
       database:
         condition: service_healthy
       config-server:
-        condition: service_started  
+        condition: service_healthy
     networks:
       backend:
         aliases:
@@ -67,9 +72,11 @@ services:
       OAUTH2_CLIENT_SECRET: ${OAUTH2_CLIENT_SECRET}
     depends_on:
       config-server:
-        condition: service_started
+        condition: service_healthy
       discovery-server:
         condition: service_started
+      redis:
+        condition: service_healthy
     ports:
       - "8080:8080"
     networks:
@@ -89,7 +96,7 @@ services:
       database:
         condition: service_healthy
       config-server:
-        condition: service_started
+        condition: service_healthy
       kafka:
         condition: service_started
     ports:
@@ -112,9 +119,11 @@ services:
       database:
         condition: service_healthy
       config-server:
-        condition: service_started
+        condition: service_healthy
       kafka:
         condition: service_started
+      redis:
+        condition: service_healthy
     ports:
       - "8082:8082"
     networks:
@@ -135,9 +144,11 @@ services:
       database:
         condition: service_healthy
       config-server:
-        condition: service_started
+        condition: service_healthy
       kafka:
         condition: service_started
+      redis:
+        condition: service_healthy
     ports:
       - "8083:8083"
     networks:
@@ -157,7 +168,7 @@ services:
       database:
         condition: service_healthy
       config-server:
-        condition: service_started
+        condition: service_healthy
       kafka:
         condition: service_started
     ports:
@@ -177,7 +188,9 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
     depends_on:
       config-server:
-        condition: service_started
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     ports:
       - "8084:8084"
     networks:
@@ -216,6 +229,11 @@ services:
       backend:
         aliases:
           - redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "6379", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
   minio:
     image: docker.io/bitnami/minio:latest
     ports:
@@ -227,6 +245,11 @@ services:
       - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
       - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
       - MINIO_DEFAULT_BUCKETS=post-images
+    healthcheck:
+      test: ["CMD", "sh", "-c", "mc alias set local http://localhost:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && mc admin info local"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
     networks:
       backend:
         aliases:

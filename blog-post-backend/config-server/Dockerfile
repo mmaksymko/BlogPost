@@ -17,6 +17,9 @@ RUN --mount=type=cache,target=/root/.m2 ./mvnw -f $HOME/pom.xml clean package
 # Package stage
 #
 FROM eclipse-temurin:22-alpine
+
+RUN apk add --no-cache curl
+
 ARG JAR_FILE=/usr/app/target/*.jar
 COPY --from=build $JAR_FILE /app/${APP_NAME}.jar
 EXPOSE 8080
