@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class UserConsumer {
     private final UserService userService;
 
-    @KafkaListener(id = "comments-post-event-listener", topics = "post-event", autoStartup = "false")
+    @KafkaListener(id = "gateway-user-event-listener", topics = "user-event", autoStartup = "false")
     public void postEventListener(@Payload UserEvent userEvent) {
         switch(userEvent.getEventType()) {
             case EventType.CREATED -> userService.createUser(userEvent).subscribe();
