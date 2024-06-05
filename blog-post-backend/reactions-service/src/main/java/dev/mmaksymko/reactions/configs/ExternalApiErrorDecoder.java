@@ -6,11 +6,17 @@ import dev.mmaksymko.reactions.configs.exceptions.ExternalApiClientException;
 import dev.mmaksymko.reactions.configs.exceptions.ExternalApiServerException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 
 public class ExternalApiErrorDecoder implements ErrorDecoder {
+    private final ObjectMapper objectMapper;
+
+    public ExternalApiErrorDecoder(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public Exception decode(String methodKey, Response response) {
@@ -29,7 +35,6 @@ public class ExternalApiErrorDecoder implements ErrorDecoder {
     private String getErrorMessage(String url, HttpStatus status, Response.Body body) {
         String error;
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             error = objectMapper.readValue(body.asInputStream(), ErrorResponse.class).error();
         } catch (IOException e) {
             error = status.name();
