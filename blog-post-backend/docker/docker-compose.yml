@@ -144,6 +144,28 @@ services:
       backend:
         aliases:
           - "reactions-service"
+  users-service:
+    build:
+      context: ../users-service
+      dockerfile: Dockerfile
+    image: mmaksymko/blog-post-users-service:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+      kafka:
+        condition: service_started
+    ports:
+      - "8085:8085"
+    networks:
+      backend:
+        aliases:
+          - "users-service"
   images-service:
     build:
       context: ../images-service
@@ -209,30 +231,6 @@ services:
       backend:
         aliases:
           - minio
-  # keycloak:
-  #   image: bitnami/keycloak:latest
-  #   environment:
-  #     KEYCLOAK_DATABASE_VENDOR: postgresql
-  #     KEYCLOAK_DATABASE_HOST: database
-  #     KEYCLOAK_DATABASE_USER: ${POSTGRES_USER}
-  #     KEYCLOAK_DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-  #     KEYCLOAK_DATABASE_NAME: ${KEYCLOAK_DB}
-  #     KEYCLOAK_ADMIN: ${KEYCLOAK_USER}
-  #     KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
-  #     KEYCLOAK_ENABLE_STATISTICS: true
-  #     KEYCLOAK_ENABLE_HEALTH_ENDPOINTS: true
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     database:
-  #       condition: service_healthy
-  #   volumes:
-  #     - ./realm-config.json:/opt/keycloak/import/realm-config.json
-  #     - ./keycloak.conf:/opt/keycloak/conf
-  #   networks:
-  #     backend:
-  #       aliases:
-  #         - keycloak
 networks:
   backend:
     driver: bridge
