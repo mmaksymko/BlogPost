@@ -63,18 +63,21 @@ CREATE DATABASE user_db;
 CREATE DOMAIN USER_ROLE_DOMAIN AS TEXT
 CHECK (VALUE IN ('USER', 'ADMIN', 'SUPER_ADMIN'));
 
-CREATE TABLE user (
+CREATE TABLE IF NOT EXISTS blog_user (
     user_id SERIAL PRIMARY KEY,
+	email TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     role USER_ROLE_DOMAIN NOT NULL,
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_blog_user_email ON blog_user (email);
 
 CREATE TABLE user_pfp (
     pfp_url TEXT NOT NULL,
-    user_id INTEGER REFERENCES user(user_id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES blog_user(user_id) ON DELETE CASCADE,
     PRIMARY KEY (pfp_url, user_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_pfp_user_id ON user_pfp (user_id);
+
