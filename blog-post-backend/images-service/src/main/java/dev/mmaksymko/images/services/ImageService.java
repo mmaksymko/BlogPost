@@ -1,5 +1,6 @@
 package dev.mmaksymko.images.services;
 
+import dev.mmaksymko.images.configs.MinioProperties;
 import dev.mmaksymko.images.configs.exceptions.BucketCreationException;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -10,11 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @AllArgsConstructor
 public class ImageService {
     private final MinioClient minioClient;
+    private final MinioProperties minioProperties;
 
     public byte[] getImage(String bucketName, String objectName) {
         try {
@@ -48,7 +52,7 @@ public class ImageService {
                     .build();
 
             ObjectWriteResponse response = minioClient.putObject(object);
-            return response.object();
+            return returnURI(bucketName, response.object());
         } catch (Exception e) {
             throw new NoSuchElementException("Error while uploading image", e);
         }
@@ -91,6 +95,20 @@ public class ImageService {
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new IllegalArgumentException("Invalid file type. Only image files are accepted.");
         }
+    }
+
+    private String returnURI(String bucketName, String objectName) {
+        String host = getHostFromUrl(minioProperties.url());
+        return String.format("%s/%s/%s", host, bucketName, objectName);
+    }
+
+    private String getHostFromUrl(String url) {
+        Pattern pattern = Pattern.compile("http://minio:(\\d+)/");
+        Matcher matcher = pattern.matcher(url);
+
+        return matcher.find()
+                ? String.format("http://localhost:%s/", matcher.group(1))
+                : url;
     }
 
     private String getPublicPolicy(String bucketName) {
