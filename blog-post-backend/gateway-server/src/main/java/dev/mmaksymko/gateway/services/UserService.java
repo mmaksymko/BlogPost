@@ -34,9 +34,8 @@ public class UserService {
     }
 
     public Mono<User> createUser(User user) {
-        System.out.println("Creating user");
-        return
-                userClient.createUser(user)
+        return userClient
+                .createUser(user)
                 .flatMap(userRepository::save)
                 .flatMap(u -> Mono
                         .just(u)
