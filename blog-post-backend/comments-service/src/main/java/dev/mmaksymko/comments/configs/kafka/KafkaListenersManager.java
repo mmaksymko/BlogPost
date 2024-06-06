@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.scheduling.annotation.Scheduled;
 
-@@Configuration
+@Configuration
 public class KafkaListenersManager {
 
     private final KafkaListenerEndpointRegistry registry;
