@@ -19,7 +19,7 @@ public class UserProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final KafkaAvailabilityManager kafkaAvailabilityManager;
 
-    public void sendMessage(String topic, UserEvent event) {
+    public void sendMessage(String topic, User event) {
         if (!kafkaAvailabilityManager.isAvailable()) {
             return;
         }
@@ -32,6 +32,6 @@ public class UserProducer {
     }
 
     public Mono<Void> sendCreatedEvent(User user) {
-        return Mono.fromRunnable( () -> sendMessage(TOPIC, new UserEvent(user, EventType.CREATED)));
+        return Mono.fromRunnable( () -> sendMessage(TOPIC, user));
     }
 }
