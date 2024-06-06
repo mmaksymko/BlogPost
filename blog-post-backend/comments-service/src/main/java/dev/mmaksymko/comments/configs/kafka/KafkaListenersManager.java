@@ -1,11 +1,11 @@
 package dev.mmaksymko.comments.configs.kafka;
 
 import org.springframework.boot.actuate.health.Status;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
-@Component
+@@Configuration
 public class KafkaListenersManager {
 
     private final KafkaListenerEndpointRegistry registry;
