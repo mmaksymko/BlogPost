@@ -177,6 +177,26 @@ services:
       backend:
         aliases:
           - "users-service"
+  email-service:
+    build:
+      context: ../email-service
+      dockerfile: Dockerfile
+    image: mmaksymko/blog-post-email-service:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EMAIL_USERNAME: ${EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+    depends_on:
+      config-server:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    ports:
+      - "8086:8086"
+    networks:
+      backend:
+        aliases:
+          - "email-service"
   images-service:
     build:
       context: ../images-service
