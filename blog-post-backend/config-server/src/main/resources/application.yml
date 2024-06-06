@@ -11,12 +11,6 @@ spring:
           search-paths: '{application}'
         encrypt:
           enabled: ${ENCRYPT_ENABLED:true}
-  security:
-    oauth2:
-      client:
-        provider:
-          google:
-            issuer-uri: https://accounts.google.com
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
