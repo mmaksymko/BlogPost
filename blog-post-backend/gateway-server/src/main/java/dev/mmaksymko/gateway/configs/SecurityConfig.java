@@ -45,7 +45,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontEndProperties.url(), frontEndProperties.url() + "/oauth2/redirect", frontEndProperties.url() + "/**", "*"));
+        configuration.setAllowedOrigins(List.of(frontEndProperties.url(), frontEndProperties.url() + "/oauth2/redirect", frontEndProperties.url() + "/**"));
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
