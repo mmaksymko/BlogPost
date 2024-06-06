@@ -44,13 +44,11 @@ public class PostReactionService {
 
         Map<String, ReactionType> allReactionTypes = reactionTypeService.getAllReactionTypes();
 
-        Map<String, Long> result = allReactionTypes.keySet().stream()
+        return allReactionTypes.keySet().stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
                         key -> countResult.getOrDefault(key, 0L)
                 ));
-        System.out.println(result);
-        return result;
     }
 
     public PostReactionResponse getPostReaction(Long commentId, Long userId) {
