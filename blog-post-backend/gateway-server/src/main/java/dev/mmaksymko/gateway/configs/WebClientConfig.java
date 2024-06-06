@@ -1,6 +1,7 @@
 package dev.mmaksymko.gateway.configs;
 
 import dev.mmaksymko.gateway.clients.UserClient;
+import dev.mmaksymko.gateway.configs.filters.ExchangeAuthFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 public class WebClientConfig {
     private final ReactorLoadBalancerExchangeFilterFunction lbFunction;
     private final ExternalApiErrorDecoder errorDecoder;
+    private final ExchangeAuthFilter authFilter;
 
     @Bean
     public WebClient webClient() {
@@ -28,6 +30,7 @@ public class WebClientConfig {
     UserClient postClient(WebClient webClient) {
         WebClient client = webClient
                 .mutate()
+                .filter(authFilter)
                 .baseUrl("http://users-service/")
                 .build();
 
