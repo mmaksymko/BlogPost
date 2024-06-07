@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class CurrentUserInfo {
     private Long id=null;
-    private UserRole role = null;
+    private UserRole role = UserRole.UNATHORIZED;
 
     public void unset(){
-        this.role=null;
+        this.role=UserRole.UNATHORIZED;
         this.id=null;
     }
 }
