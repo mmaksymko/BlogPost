@@ -189,6 +189,7 @@ services:
     image: mmaksymko/blog-post-email-service:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
       EMAIL_USERNAME: ${EMAIL_USERNAME}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-6486b0fbf6b5271b735c1890af880484eec743795016378c6446758986179527}
