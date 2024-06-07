@@ -1,6 +1,7 @@
-package dev.mmaksymko.gateway.configs;
+package dev.mmaksymko.gateway.configs.web;
 
 import dev.mmaksymko.gateway.clients.UserClient;
+import dev.mmaksymko.gateway.configs.exceptions.ExternalApiErrorDecoder;
 import dev.mmaksymko.gateway.configs.filters.ExchangeAuthFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;

@@ -1,8 +1,9 @@
-package dev.mmaksymko.reactions.configs;
+package dev.mmaksymko.comments.configs.exceptions;
 
-import dev.mmaksymko.reactions.dto.ErrorResponse;
-import dev.mmaksymko.reactions.configs.exceptions.ExternalApiClientException;
-import dev.mmaksymko.reactions.configs.exceptions.ExternalApiServerException;
+import dev.mmaksymko.comments.configs.exceptions.ExternalApiClientException;
+import dev.mmaksymko.comments.configs.exceptions.ExternalApiServerException;
+import dev.mmaksymko.comments.configs.exceptions.ResourceGoneException;
+import dev.mmaksymko.comments.dto.ErrorResponse;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.retry.MaxRetriesExceededException;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ErrorResponse> handleException(NoSuchElementException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ResourceGoneException.class)
+    public ResponseEntity<ErrorResponse> handleException(ResourceGoneException e) {
+        return ResponseEntity.status(HttpStatus.GONE).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(ExternalApiServerException.class)

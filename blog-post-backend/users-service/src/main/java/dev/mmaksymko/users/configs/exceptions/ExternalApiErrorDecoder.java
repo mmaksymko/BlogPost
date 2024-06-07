@@ -1,4 +1,4 @@
-package dev.mmaksymko.users.configs;
+package dev.mmaksymko.users.configs.exceptions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.mmaksymko.users.configs.exceptions.ExternalApiClientException;

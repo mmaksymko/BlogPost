@@ -1,4 +1,4 @@
-package dev.mmaksymko.email.configs;
+package dev.mmaksymko.reactions.configs.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

@@ -1,6 +1,7 @@
-package dev.mmaksymko.comments.configs;
+package dev.mmaksymko.users.configs.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.mmaksymko.users.configs.exceptions.ExternalApiErrorDecoder;
 import feign.codec.ErrorDecoder;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;

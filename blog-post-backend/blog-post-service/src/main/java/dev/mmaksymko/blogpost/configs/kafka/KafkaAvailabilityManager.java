@@ -1,4 +1,4 @@
-package dev.mmaksymko.blogpost.configs;
+package dev.mmaksymko.blogpost.configs.kafka;
 
 
 import org.apache.kafka.clients.admin.AdminClient;

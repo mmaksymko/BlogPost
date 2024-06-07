@@ -1,4 +1,4 @@
-package dev.mmaksymko.users.configs;
+package dev.mmaksymko.users.configs.kafka;
 
 
 import org.apache.kafka.clients.admin.AdminClient;

@@ -1,4 +1,4 @@
-package dev.mmaksymko.comments.configs;
+package dev.mmaksymko.comments.configs.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

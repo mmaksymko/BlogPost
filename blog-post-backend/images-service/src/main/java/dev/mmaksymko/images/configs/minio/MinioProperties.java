@@ -1,4 +1,4 @@
-package dev.mmaksymko.images.configs;
+package dev.mmaksymko.images.configs.minio;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

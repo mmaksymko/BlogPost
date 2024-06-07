@@ -1,4 +1,4 @@
-package dev.mmaksymko.gateway.configs;
+package dev.mmaksymko.gateway.configs.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

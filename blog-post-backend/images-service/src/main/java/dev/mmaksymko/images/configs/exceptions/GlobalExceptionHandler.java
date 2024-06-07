@@ -1,4 +1,4 @@
-package dev.mmaksymko.images.configs;
+package dev.mmaksymko.images.configs.exceptions;
 
 import dev.mmaksymko.images.configs.exceptions.BucketCreationException;
 import dev.mmaksymko.images.dto.ErrorResponse;

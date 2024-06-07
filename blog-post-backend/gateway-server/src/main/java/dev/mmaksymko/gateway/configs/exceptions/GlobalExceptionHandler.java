@@ -1,4 +1,4 @@
-package dev.mmaksymko.gateway.configs;
+package dev.mmaksymko.gateway.configs.exceptions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.mmaksymko.gateway.configs.exceptions.ExternalApiClientException;

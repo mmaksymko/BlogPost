@@ -1,4 +1,4 @@
-package dev.mmaksymko.email.configs;
+package dev.mmaksymko.email.configs.exceptions;
 
 import dev.mmaksymko.email.dto.ErrorResponse;
 import jakarta.mail.MessagingException;

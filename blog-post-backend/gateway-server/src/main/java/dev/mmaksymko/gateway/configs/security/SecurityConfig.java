@@ -1,5 +1,6 @@
-package dev.mmaksymko.gateway.configs;
+package dev.mmaksymko.gateway.configs.security;
 
+import dev.mmaksymko.gateway.configs.FrontEndProperties;
 import dev.mmaksymko.gateway.handlers.OAuth2LoginSuccessHandler;
 import dev.mmaksymko.gateway.handlers.OAuth2LogoutSuccessHandler;
 

@@ -1,9 +1,9 @@
-package dev.mmaksymko.comments.configs;
+package dev.mmaksymko.reactions.configs.exceptions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.mmaksymko.comments.configs.exceptions.ExternalApiClientException;
-import dev.mmaksymko.comments.configs.exceptions.ExternalApiServerException;
-import dev.mmaksymko.comments.dto.ErrorResponse;
+import dev.mmaksymko.reactions.dto.ErrorResponse;
+import dev.mmaksymko.reactions.configs.exceptions.ExternalApiClientException;
+import dev.mmaksymko.reactions.configs.exceptions.ExternalApiServerException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package dev.mmaksymko.blogpost.configs;
+package dev.mmaksymko.users.configs.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

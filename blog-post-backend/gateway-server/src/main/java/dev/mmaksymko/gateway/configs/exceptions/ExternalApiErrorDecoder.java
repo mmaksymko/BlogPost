@@ -1,4 +1,4 @@
-package dev.mmaksymko.gateway.configs;
+package dev.mmaksymko.gateway.configs.exceptions;
 
 import dev.mmaksymko.gateway.configs.exceptions.ExternalApiClientException;
 import dev.mmaksymko.gateway.configs.exceptions.ExternalApiServerException;
