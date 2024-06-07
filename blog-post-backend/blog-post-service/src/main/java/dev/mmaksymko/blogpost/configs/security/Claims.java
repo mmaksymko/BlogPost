@@ -14,6 +14,6 @@ public class Claims {
     }
 
     public Object getClaim(String key) {
-        return claims.get(key);
+        return claims.getOrDefault(key, null);
     }
 }

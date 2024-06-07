@@ -41,6 +41,7 @@ public class JwtConfig {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
             String role = (String) claims.getClaim("role");
+            role = role == null ? "UNKNOWN" : role;
             return List.of(new SimpleGrantedAuthority("ROLE_" + role));
         });
         return jwtAuthenticationConverter;
