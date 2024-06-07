@@ -1,6 +1,7 @@
 package dev.mmaksymko.gateway.configs.security;
 
 import dev.mmaksymko.gateway.models.UserRole;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Configuration;
@@ -9,11 +10,16 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 public class CurrentUserInfo {
-    private Long id=null;
-    private UserRole role = UserRole.UNATHORIZED;
+    private Long id;
+    private UserRole role;
+
+    @PostConstruct
+    public void init(){
+        unset();
+    }
 
     public void unset(){
         this.role=UserRole.UNATHORIZED;
-        this.id=null;
+        this.id=-1L;
     }
 }
