@@ -2,7 +2,7 @@ package dev.mmaksymko.users.services.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.mmaksymko.users.configs.KafkaAvailabilityManager;
+import dev.mmaksymko.users.configs.kafka.KafkaAvailabilityManager;
 import dev.mmaksymko.users.dto.UserResponse;
 import dev.mmaksymko.users.dto.kafka.EventType;
 import dev.mmaksymko.users.dto.kafka.UserEvent;

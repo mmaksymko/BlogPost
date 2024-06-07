@@ -1,6 +1,7 @@
 package dev.mmaksymko.reactions.services;
 
 import dev.mmaksymko.reactions.clients.CommentClient;
+import dev.mmaksymko.reactions.configs.security.Claims;
 import dev.mmaksymko.reactions.dto.CommentReactionRequest;
 import dev.mmaksymko.reactions.dto.CommentReactionResponse;
 import dev.mmaksymko.reactions.dto.ReactionCount;
@@ -13,6 +14,7 @@ import dev.mmaksymko.reactions.services.redis.RedisCommentService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
+import jakarta.ws.rs.ForbiddenException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ public class CommentReactionService {
     private final CommentClient commentClient;
     private final ReactionTypeService reactionTypeService;
     private final RedisCommentService redisCommentService;
+    private final Claims claims;
 
     public Page<CommentReactionResponse> getCommentReactions(Long commentId, Pageable pageable) {
         return commentReactionRepository.findAllByIdCommentId(commentId, pageable).map(commentReactionMapper::toResponse);
@@ -73,7 +76,7 @@ public class CommentReactionService {
     public CommentReactionResponse addCommentReaction(CommentReactionRequest request) {
         Comment comment = commentClient.getComment(request.commentId());
 
-        CommentReaction reaction = commentReactionMapper.toEntity(request);
+        CommentReaction reaction = commentReactionMapper.toEntity(request, getUserId());
 
         CommentReaction savedReaction = commentReactionRepository.save(reaction);
 
@@ -89,12 +92,12 @@ public class CommentReactionService {
                 .CommentReactionId
                 .builder()
                 .commentId(request.commentId())
-                .userId(request.userId())
+                .userId(getUserId())
                 .build();
 
         commentReactionRepository.findById(reactionId).orElseThrow();
 
-        CommentReaction reaction = commentReactionMapper.toEntity(request);
+        CommentReaction reaction = commentReactionMapper.toEntity(request, reactionId.getUserId());
 
         CommentReaction savedReaction = commentReactionRepository.save(reaction);
 
@@ -106,6 +109,10 @@ public class CommentReactionService {
     @Retry(name = "retry-reaction")
     @RateLimiter(name = "rate-limit-reaction")
     public void deleteCommentReaction(Long commentId, Long userId) {
+        if (!isUserAllowedToModify(userId)) {
+            throw new ForbiddenException("You are not allowed to delete this reaction");
+        }
+
         var reactionId = CommentReaction
                 .CommentReactionId
                 .builder()
@@ -123,5 +130,15 @@ public class CommentReactionService {
             redisCommentService.saveComment(comment);
         }
         return comment;
+    }
+
+    private boolean isUserAllowedToModify(Long userId) {
+        return claims.getClaim("role").equals("ADMIN")
+                || claims.getClaim("role").equals("SUPER_ADMIN")
+                || userId.toString().equals(claims.getClaim("id"));
+    }
+
+    private Long getUserId() {
+        return Long.valueOf(claims.getClaim("id").toString());
     }
 }

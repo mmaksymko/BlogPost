@@ -2,8 +2,6 @@ package dev.mmaksymko.reactions.controllers;
 
 import dev.mmaksymko.reactions.dto.PostReactionRequest;
 import dev.mmaksymko.reactions.dto.PostReactionResponse;
-import dev.mmaksymko.reactions.dto.ReactionTypeResponse;
-import dev.mmaksymko.reactions.models.PostReaction;
 import dev.mmaksymko.reactions.services.PostReactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/post-reactions/")
+@RequestMapping("/reactions/posts/")
 @AllArgsConstructor
 public class PostReactionController {
     private final PostReactionService postReactionService;

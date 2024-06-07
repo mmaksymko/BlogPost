@@ -1,6 +1,6 @@
 package dev.mmaksymko.comments.clients;
 
-import dev.mmaksymko.comments.configs.OpenFeignClientConfiguration;
+import dev.mmaksymko.comments.configs.web.OpenFeignClientConfiguration;
 import dev.mmaksymko.comments.models.Post;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/reaction-types/")
+@RequestMapping("/reactions/types/")
 @AllArgsConstructor
 public class ReactionTypeController {
     private final ReactionTypeService reactionTypeService;

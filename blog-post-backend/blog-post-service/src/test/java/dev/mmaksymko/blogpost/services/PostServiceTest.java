@@ -53,7 +53,7 @@ public class PostServiceTest {
 
         post = Post.builder().title(TEST_TITLE).content(TEST_CONTENT).build();
         postResponse = new PostResponse(1L, TEST_TITLE, TEST_CONTENT, 1L, null);
-        postRequest = new PostRequest(TEST_TITLE, TEST_CONTENT, 1L);
+        postRequest = new PostRequest(TEST_TITLE, TEST_CONTENT);
         postUpdateRequest = new PostUpdateRequest(UPDATED_TITLE, UPDATED_CONTENT);
         pageable = Pageable.unpaged();
     }
@@ -124,7 +124,7 @@ public class PostServiceTest {
         @Test
         @DisplayName("Added post is returned")
         public void whenPostIsValid() {
-            when(postMapper.toEntity(any(PostRequest.class))).thenReturn(post);
+            when(postMapper.toEntity(any(PostRequest.class), 1L)).thenReturn(post);
             when(postRepository.save(any(Post.class))).thenReturn(post);
             when(postMapper.toResponse(post)).thenReturn(postResponse);
 
@@ -132,7 +132,7 @@ public class PostServiceTest {
 
             assertEquals(postResponse, result);
 
-            verify(postMapper, times(1)).toEntity(postRequest);
+            verify(postMapper, times(1)).toEntity(postRequest, 1L);
             verify(postRepository, times(1)).save(post);
             verify(postMapper, times(1)).toResponse(post);
         }

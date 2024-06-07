@@ -6,6 +6,5 @@ import org.springframework.lang.NonNull;
 @Builder
 public record PostRequest(
     @NonNull String title,
-    @NonNull String content,
-    @NonNull Long authorId
+    @NonNull String content
 ) {}

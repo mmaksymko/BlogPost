@@ -1,6 +1,6 @@
 package dev.mmaksymko.reactions.clients;
 
-import dev.mmaksymko.reactions.configs.OpenFeignClientConfiguration;
+import dev.mmaksymko.reactions.configs.web.OpenFeignClientConfiguration;
 import dev.mmaksymko.reactions.models.Post;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

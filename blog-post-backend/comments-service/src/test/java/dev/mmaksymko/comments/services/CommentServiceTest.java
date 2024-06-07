@@ -47,7 +47,7 @@ public class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        commentService = new CommentService(commentRepository, commentMapper, postClient, null, null);
+        commentService = new CommentService(commentRepository, commentMapper, postClient, null, null, null);
 
         comment = new Comment();
         baseCommentResponse = new BaseCommentResponse();
@@ -159,7 +159,7 @@ public class CommentServiceTest {
             commentRequest = new CommentRequest(1L, null, 1L, "");
 
             when(postClient.getPost(any(Long.class))).thenReturn(post);
-            when(commentMapper.toEntity(any(CommentRequest.class), isNull())).thenReturn(comment);
+            when(commentMapper.toEntity(any(CommentRequest.class), isNull(), 1L)).thenReturn(comment);
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.empty());
             when(commentRepository.save(any(Comment.class))).thenReturn(comment);
             when(commentMapper.toResponse(comment)).thenReturn(commentResponse);
@@ -170,7 +170,7 @@ public class CommentServiceTest {
             assertEquals(commentResponse.getUserId(), commentRequest.userId());
             assertEquals(commentResponse.getContent(), commentRequest.content());
 
-            verify(commentMapper, times(1)).toEntity(any(CommentRequest.class), isNull());
+            verify(commentMapper, times(1)).toEntity(any(CommentRequest.class), isNull(), 1L);
             verify(commentRepository, times(1)).save(any(Comment.class));
             verify(commentRepository, times(0)).findById(any(Long.class));
             verify(commentMapper, times(1)).toResponse(any(Comment.class));
@@ -184,7 +184,7 @@ public class CommentServiceTest {
             CommentResponse commentResponse = new CommentResponse(baseCommentResponse);
             commentRequest = new CommentRequest(1L, parentId, 1L, "");
 
-            when(commentMapper.toEntity(any(CommentRequest.class), any(Comment.class))).thenReturn(comment);
+            when(commentMapper.toEntity(any(CommentRequest.class), any(Comment.class), 1L)).thenReturn(comment);
             when(commentRepository.save(any(Comment.class))).thenReturn(comment);
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
             when(commentMapper.toResponse(comment)).thenReturn(commentResponse);
@@ -196,7 +196,7 @@ public class CommentServiceTest {
             assertEquals(commentResponse.getUserId(), commentRequest.userId());
             assertEquals(commentResponse.getContent(), commentRequest.content());
 
-            verify(commentMapper, times(1)).toEntity(any(CommentRequest.class), any(Comment.class));
+            verify(commentMapper, times(1)).toEntity(any(CommentRequest.class), any(Comment.class), 1L);
             verify(commentRepository, times(1)).save(any(Comment.class));
             verify(commentRepository, times(1)).findById(any(Long.class));
             verify(commentMapper, times(1)).toResponse(any(Comment.class));

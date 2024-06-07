@@ -48,12 +48,12 @@ public class CommentMapper {
     }
 
 
-    public Comment toEntity(CommentRequest commentRequest, Comment parentComment) {
+    public Comment toEntity(CommentRequest commentRequest, Comment parentComment, Long userId) {
         return Comment
                 .builder()
                 .postId(commentRequest.postId())
                 .parentComment(parentComment)
-                .userId(commentRequest.userId())
+                .userId(userId)
                 .content(commentRequest.content())
                 .build();
     }

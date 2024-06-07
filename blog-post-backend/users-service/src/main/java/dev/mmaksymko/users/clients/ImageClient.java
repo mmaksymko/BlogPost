@@ -1,6 +1,6 @@
 package dev.mmaksymko.users.clients;
 
-import dev.mmaksymko.users.configs.OpenFeignClientConfiguration;
+import dev.mmaksymko.users.configs.web.OpenFeignClientConfiguration;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

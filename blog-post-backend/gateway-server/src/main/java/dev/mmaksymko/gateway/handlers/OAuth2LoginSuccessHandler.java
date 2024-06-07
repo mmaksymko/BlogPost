@@ -1,9 +1,11 @@
 package dev.mmaksymko.gateway.handlers;
 
+import dev.mmaksymko.gateway.configs.security.CurrentUserInfo;
 import dev.mmaksymko.gateway.models.User;
 import dev.mmaksymko.gateway.models.UserRole;
 import dev.mmaksymko.gateway.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.security.core.Authentication;
@@ -11,6 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
@@ -22,9 +25,10 @@ import java.util.*;
 
 @Configuration
 @RequiredArgsConstructor
+@Log4j2
 public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHandler {
     private final UserService userService;
-    private final SecurityContext securityContext;
+    private final CurrentUserInfo currentUserId;
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
@@ -34,30 +38,31 @@ public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHan
         String email = attributes.getOrDefault("email", "").toString();
 
         return userService.getUser(email)
-                .flatMap(user -> handleUserAuthentication(user, attributes, oAuth2AuthenticationToken))
+                .doOnNext(user -> handleUserAuthentication(user, attributes, oAuth2AuthenticationToken).subscribe())
                 .switchIfEmpty(Mono.defer(() -> userService
                             .createUser(getUserFromAttributes(attributes))
-                            .flatMap(user -> handleUserAuthentication(user, attributes, oAuth2AuthenticationToken))
+                            .doOnNext(user -> handleUserAuthentication(user, attributes, oAuth2AuthenticationToken).subscribe())
                 )).then();
     }
 
-    public Mono<User> handleUserAuthentication(User user, Map<String, Object> attributes, OAuth2AuthenticationToken oAuth2AuthenticationToken) {
-        Map<String, Object> newAttributes = new HashMap<>(attributes);
-        newAttributes.put("id", user.getId());
-
-        DefaultOAuth2User newUser = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority(user.getRole().name())),
-                newAttributes, "email");
-
-        Authentication securityAuth = new OAuth2AuthenticationToken(newUser,
+    public Mono<Void> handleUserAuthentication(User user, Map<String, Object> attributes, OAuth2AuthenticationToken oAuth2AuthenticationToken) {
+        return Mono
+                .just(new DefaultOAuth2User(List.of(new SimpleGrantedAuthority(user.getRole().name())), attributes, "email"))
+                .doOnNext(__ -> currentUserId.setId(user.getId()))
+                .doOnNext(__ -> currentUserId.setRole(user.getRole()))
+                .map(newUser -> new OAuth2AuthenticationToken(newUser,
                 List.of(new SimpleGrantedAuthority(user.getRole().name()),
                         new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
-                oAuth2AuthenticationToken.getAuthorizedClientRegistrationId());
-
-        securityContext.setAuthentication(securityAuth);
-
-        ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext));
-
-        return Mono.just(user);
+                oAuth2AuthenticationToken.getAuthorizedClientRegistrationId()))
+                .doOnNext(System.out::println)
+                .map(securityAuth -> {
+                    SecurityContext securityContext = new SecurityContextImpl();
+                    securityContext.setAuthentication(securityAuth);
+                    return securityContext;
+                })
+                .map(securityContext -> Mono.deferContextual(Mono::just)
+                        .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext))))
+                .then();
     }
 
     public User getUserFromAttributes(Map<String, Object> attributes){

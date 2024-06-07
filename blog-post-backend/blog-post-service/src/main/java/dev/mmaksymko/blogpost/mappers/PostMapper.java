@@ -18,12 +18,12 @@ public class PostMapper {
                 .build();
     }
 
-    public Post toEntity(PostRequest postRequest) {
+    public Post toEntity(PostRequest postRequest, Long authorId) {
         return Post
                 .builder()
                 .title(postRequest.title())
                 .content(postRequest.content())
-                .authorId(postRequest.authorId())
+                .authorId(authorId)
                 .build();
     }
 }

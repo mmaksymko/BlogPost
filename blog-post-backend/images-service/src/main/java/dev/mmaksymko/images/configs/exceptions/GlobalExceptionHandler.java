@@ -1,7 +1,7 @@
 package dev.mmaksymko.images.configs.exceptions;
 
-import dev.mmaksymko.images.configs.exceptions.BucketCreationException;
 import dev.mmaksymko.images.dto.ErrorResponse;
+import jakarta.ws.rs.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,15 +27,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
     }
 
-//    @ExceptionHandler(RequestNotPermitted.class)
-//    public ResponseEntity<ErrorResponse> handleException(RequestNotPermitted e) {
-//        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(new ErrorResponse(e.getMessage()));
-//    }
-
-//    @ExceptionHandler(MaxRetriesExceededException.class)
-//    public ResponseEntity<ErrorResponse> handleException(MaxRetriesExceededException e) {
-//        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ErrorResponse(e.getMessage()));
-//    }
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleException(ForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+    }
 
     @ExceptionHandler(ServerWebInputException.class)
     public ResponseEntity<ErrorResponse> handleException(ServerWebInputException e) {

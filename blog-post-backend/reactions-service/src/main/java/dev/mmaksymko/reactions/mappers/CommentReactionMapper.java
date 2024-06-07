@@ -16,12 +16,12 @@ public class CommentReactionMapper {
     private final ReactionTypeService reactionTypeService;
     private final ReactionTypeMapper reactionTypeMapper;
 
-    public CommentReaction toEntity(CommentReactionRequest request) {
+    public CommentReaction toEntity(CommentReactionRequest request, Long userId) {
         var id = CommentReaction
                 .CommentReactionId
                 .builder()
                 .commentId(request.commentId())
-                .userId(request.userId())
+                .userId(userId)
                 .build();
         var reactionTypes = reactionTypeService.getAllReactionTypes();
         var reactionType = Optional.ofNullable(reactionTypes.get(request.reaction()))

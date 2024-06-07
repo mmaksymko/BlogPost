@@ -1,6 +1,6 @@
 package dev.mmaksymko.images;
 
-import dev.mmaksymko.images.configs.MinioProperties;
+import dev.mmaksymko.images.configs.minio.MinioProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

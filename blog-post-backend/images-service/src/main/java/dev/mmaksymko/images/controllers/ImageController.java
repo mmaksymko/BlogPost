@@ -4,6 +4,7 @@ import dev.mmaksymko.images.services.ImageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +33,7 @@ public class ImageController {
     }
 
     @DeleteMapping("/{bucket}/{name}/")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public void deleteImage(@PathVariable String bucket, @PathVariable String name) {
         imageService.deleteImage(bucket, name);
     }

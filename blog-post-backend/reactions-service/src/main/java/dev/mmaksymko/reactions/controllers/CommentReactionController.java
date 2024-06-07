@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/comment-reactions/")
+@RequestMapping("/reactions/comments/")
 @AllArgsConstructor
 public class CommentReactionController {
     private final CommentReactionService commentReactionService;

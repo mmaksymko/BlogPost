@@ -1,5 +1,6 @@
 package dev.mmaksymko.reactions.services;
 
+import dev.mmaksymko.reactions.configs.security.Claims;
 import dev.mmaksymko.reactions.dto.ReactionTypeRequest;
 import dev.mmaksymko.reactions.dto.ReactionTypeResponse;
 import dev.mmaksymko.reactions.mappers.ReactionTypeMapper;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class ReactionTypeService {
     private final ReactionTypeRepository reactionTypeRepository;
     private final ReactionTypeMapper reactionTypeMapper;
+    private final Claims claims;
 
     public Page<ReactionTypeResponse> getPageOfReactionTypes(Pageable pageable) {
         if (pageable == null) {

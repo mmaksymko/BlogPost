@@ -1,6 +1,7 @@
 package dev.mmaksymko.users.services;
 
 import dev.mmaksymko.users.clients.ImageClient;
+import dev.mmaksymko.users.configs.security.Claims;
 import dev.mmaksymko.users.dto.UserRequest;
 import dev.mmaksymko.users.dto.UserUpdateRequest;
 import dev.mmaksymko.users.dto.UserResponse;
@@ -10,6 +11,7 @@ import dev.mmaksymko.users.models.UserRole;
 import dev.mmaksymko.users.repositories.UserRepository;
 import dev.mmaksymko.users.services.kafka.UserProducer;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.ws.rs.ForbiddenException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,10 +26,11 @@ import java.util.List;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-//    private final AuthService authService;
     private final UserMapper userMapper;
     private final UserProducer userProducer;
     private final ImageClient imageClient;
+    private final Claims claims;
+
     private static final String PPF_BUCKET = "pfp";
 
     public UserResponse getUserById(Long userId){
@@ -55,9 +58,11 @@ public class UserService {
     @Transactional
     @Modifying
     public UserResponse updateUser(Long userId, UserUpdateRequest userRequest){
-        User user = userRepository.findById(userId).orElseThrow();
+        if (!isUserAllowedToModify(userId)) {
+            throw new ForbiddenException("You don't have permission to modify this user");
+        }
 
-//        authService.checkEditAuthority(user);
+        User user = userRepository.findById(userId).orElseThrow();
 
         user.setEmail(userRequest.email());
         user.setFirstName(userRequest.firstName());
@@ -73,6 +78,10 @@ public class UserService {
     @Modifying
     @CircuitBreaker(name = "circuit-breaker-pfp")
     public UserResponse updateUserPfp(Long userId, MultipartFile image) {
+        if (!isUserAllowedToModify(userId)) {
+            throw new ForbiddenException("You don't have permission to modify this user");
+        }
+
         User user = userRepository.findById(userId).orElseThrow();
 
         String imageUrl = imageClient.uploadImage(image, PPF_BUCKET);
@@ -87,13 +96,46 @@ public class UserService {
     @Transactional
     @Modifying
     public void deleteUserById(Long userId){
-        User user = userRepository.findById(userId).orElseThrow();
+        if (!isUserAllowedToModify(userId)) {
+            throw new ForbiddenException("You don't have permission to modify this user");
+        }
 
-//        authService.checkEditAuthority(user);
+        User user = userRepository.findById(userId).orElseThrow();
 
         userRepository.deleteById(userId);
 
         UserResponse response = userMapper.toResponse(userRepository.save(user));
         userProducer.sendDeletedEvent(response);
+    }
+
+    @Transactional
+    @Modifying
+    public UserResponse appointAdmin(Long userId){
+        return changeRoleById(userId, UserRole.ADMIN);
+    }
+
+    @Transactional
+    @Modifying
+    public UserResponse fireAdmin(Long userId){
+        return changeRoleById(userId, UserRole.USER);
+    }
+
+    private UserResponse changeRoleById(Long userId, UserRole role){
+        User user = userRepository.findById(userId).orElseThrow();
+
+        if (user.getRole()!=UserRole.SUPER_ADMIN) {
+            user.setRole(role);
+        }
+
+        UserResponse response = userMapper.toResponse(userRepository.save(user));
+        userProducer.sendUpdatedEvent(response);
+
+        return response;
+    }
+
+    private boolean isUserAllowedToModify(Long userId) {
+        return claims.getClaim("role").equals(UserRole.ADMIN.name())
+                || claims.getClaim("role").equals(UserRole.SUPER_ADMIN.name())
+                || userId.toString().equals(claims.getClaim("id"));
     }
 }

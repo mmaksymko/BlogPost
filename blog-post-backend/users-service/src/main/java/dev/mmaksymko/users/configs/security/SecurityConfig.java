@@ -13,17 +13,24 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 @EnableWebSecurity
 public class SecurityConfig {
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
+
+    public SecurityConfig(JwtAuthenticationConverter jwtAuthenticationConverter) {
+        this.jwtAuthenticationConverter = jwtAuthenticationConverter;
+    }
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/users/{id}", "/users/email/{email}/").permitAll()
                         .requestMatchers("/actuator/**", "/error", "/webjars/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/{id}", "/users/email/{email}/").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2ResourceServer ->
                         oauth2ResourceServer.jwt(jwt ->
-                                jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter())
+                                jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)
                         )
                 ).build();
     }

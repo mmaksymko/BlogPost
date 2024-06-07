@@ -1,11 +1,9 @@
 package dev.mmaksymko.comments.configs.exceptions;
 
-import dev.mmaksymko.comments.configs.exceptions.ExternalApiClientException;
-import dev.mmaksymko.comments.configs.exceptions.ExternalApiServerException;
-import dev.mmaksymko.comments.configs.exceptions.ResourceGoneException;
 import dev.mmaksymko.comments.dto.ErrorResponse;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.retry.MaxRetriesExceededException;
+import jakarta.ws.rs.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,6 +47,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServerWebInputException.class)
     public ResponseEntity<ErrorResponse> handleException(ServerWebInputException e) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleException(ForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

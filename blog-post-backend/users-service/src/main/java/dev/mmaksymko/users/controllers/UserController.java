@@ -5,10 +5,9 @@ import dev.mmaksymko.users.dto.UserResponse;
 import dev.mmaksymko.users.dto.UserUpdateRequest;
 import dev.mmaksymko.users.services.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users/")
@@ -41,6 +40,17 @@ public class UserController {
         return userService.updateUserPfp(id, pfpFile);
     }
 
+    @PatchMapping("/appoint-admin/{id}/")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public UserResponse appointAdmin(@PathVariable Long id) {
+        return userService.appointAdmin(id);
+    }
+
+    @PatchMapping("/fire-admin/{id}/")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public UserResponse fireAdmin(@PathVariable Long id) {
+        return userService.fireAdmin(id);
+    }
 
     @DeleteMapping("{id}/")
     public void deleteUser(@PathVariable Long id) {

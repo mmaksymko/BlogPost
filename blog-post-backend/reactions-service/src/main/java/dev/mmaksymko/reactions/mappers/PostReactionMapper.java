@@ -1,10 +1,7 @@
 package dev.mmaksymko.reactions.mappers;
 
-import dev.mmaksymko.reactions.dto.CommentReactionRequest;
-import dev.mmaksymko.reactions.dto.CommentReactionResponse;
 import dev.mmaksymko.reactions.dto.PostReactionRequest;
 import dev.mmaksymko.reactions.dto.PostReactionResponse;
-import dev.mmaksymko.reactions.models.CommentReaction;
 import dev.mmaksymko.reactions.models.PostReaction;
 import dev.mmaksymko.reactions.services.ReactionTypeService;
 import lombok.AllArgsConstructor;
@@ -19,12 +16,12 @@ public class PostReactionMapper {
     private final ReactionTypeService reactionTypeService;
     private final ReactionTypeMapper reactionTypeMapper;
 
-    public PostReaction toEntity(PostReactionRequest request) {
+    public PostReaction toEntity(PostReactionRequest request, Long userId) {
         var id = PostReaction
                 .PostReactionId
                 .builder()
                 .postId(request.postId())
-                .userId(request.userId())
+                .userId(userId)
                 .build();
         var reactionTypes = reactionTypeService.getAllReactionTypes();
         var reactionType = Optional.ofNullable(reactionTypes.get(request.reaction()))

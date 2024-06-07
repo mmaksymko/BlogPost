@@ -1,7 +1,8 @@
 package dev.mmaksymko.images.services;
 
-import dev.mmaksymko.images.configs.MinioProperties;
+import dev.mmaksymko.images.configs.minio.MinioProperties;
 import dev.mmaksymko.images.configs.exceptions.BucketCreationException;
+import dev.mmaksymko.images.configs.security.Claims;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import io.minio.*;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 public class ImageService {
     private final MinioClient minioClient;
     private final MinioProperties minioProperties;
+    private final Claims claims;
 
     public byte[] getImage(String bucketName, String objectName) {
         try {

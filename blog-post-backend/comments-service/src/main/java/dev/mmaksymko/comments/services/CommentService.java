@@ -2,6 +2,7 @@ package dev.mmaksymko.comments.services;
 
 import dev.mmaksymko.comments.clients.PostClient;
 import dev.mmaksymko.comments.configs.exceptions.ResourceGoneException;
+import dev.mmaksymko.comments.configs.security.Claims;
 import dev.mmaksymko.comments.dto.BaseCommentResponse;
 import dev.mmaksymko.comments.dto.CommentRequest;
 import dev.mmaksymko.comments.dto.CommentResponse;
@@ -31,6 +32,7 @@ public class CommentService {
     private final PostClient postClient;
     private final CommentProducer commentProducer;
     private final RedisPostService redisPostService;
+    private final Claims claims;
 
     public Page<CommentResponse> getComments(Long postId, Pageable pageable) {
         Page<Comment> comments;
@@ -64,7 +66,7 @@ public class CommentService {
                 ? commentRepository.findById(request.parentCommentId()).orElseThrow()
                 : null;
 
-        Comment comment = commentMapper.toEntity(request, parentComment);
+        Comment comment = commentMapper.toEntity(request, parentComment, getUserId());
 
         Comment savedComment = commentRepository.save(comment);
 
@@ -83,6 +85,8 @@ public class CommentService {
 
         if (retrievedComment.getIsDeleted()) {
             throw new ResourceGoneException("Comment is deleted");
+        } else if (!isUserAllowedToModify(retrievedComment.getUserId())) {
+            throw new ResourceGoneException("User is not allowed to modify this comment");
         }
 
         retrievedComment.setContent(request.content());
@@ -102,7 +106,9 @@ public class CommentService {
         Comment retrievedComment = commentRepository.findById(id).orElseThrow();
 
         if (retrievedComment.getIsDeleted()) {
-            throw new ResourceGoneException("Comment is deleted");
+            throw new ResourceGoneException("Comment is already deleted");
+        } else if (!isUserAllowedToModify(retrievedComment.getUserId())) {
+            throw new ResourceGoneException("User is not allowed to modify this comment");
         }
 
         retrievedComment.setIsDeleted(true);
@@ -121,5 +127,15 @@ public class CommentService {
             redisPostService.savePost(post);
         }
         return post;
+    }
+
+    private boolean isUserAllowedToModify(Long userId) {
+        return claims.getClaim("role").equals("ADMIN")
+                || claims.getClaim("role").equals("SUPER_ADMIN")
+                || userId.toString().equals(claims.getClaim("id"));
+    }
+
+    private Long getUserId() {
+        return Long.parseLong(claims.getClaim("id").toString());
     }
 }

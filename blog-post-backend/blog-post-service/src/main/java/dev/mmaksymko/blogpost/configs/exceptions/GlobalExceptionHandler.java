@@ -2,6 +2,7 @@ package dev.mmaksymko.blogpost.configs.exceptions;
 
 import dev.mmaksymko.blogpost.dto.ErrorResponse;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import jakarta.ws.rs.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,6 +26,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RequestNotPermitted.class)
     public ResponseEntity<ErrorResponse> handleException(RequestNotPermitted e) {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleException(ForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
