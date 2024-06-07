@@ -1,12 +1,12 @@
-version: 3.8.0
+version: 2.27.0
 services:
   database:
     image: postgres:latest
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: "blog_db"
     volumes:
       - ./docker/init.sql:/docker-entrypoint-initdb.d/1-init.sql
@@ -65,12 +65,12 @@ services:
     image: mmaksymko/blog-post-gateway-server:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-password}
       OAUTH2_CLIENT_ID: ${OAUTH2_CLIENT_ID}
       OAUTH2_CLIENT_SECRET: ${OAUTH2_CLIENT_SECRET}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-6486b0fbf6b5271b735c1890af880484eec743795016378c6446758986179527}
     depends_on:
       config-server:
         condition: service_healthy
@@ -91,9 +91,9 @@ services:
     image: mmaksymko/blog-post-post-service:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-6486b0fbf6b5271b735c1890af880484eec743795016378c6446758986179527}
     depends_on:
       database:
         condition: service_healthy
@@ -114,10 +114,10 @@ services:
     image: mmaksymko/blog-post-comments-service:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-password}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-6486b0fbf6b5271b735c1890af880484eec743795016378c6446758986179527}
     depends_on:
       database:
         condition: service_healthy
@@ -140,10 +140,10 @@ services:
     image: mmaksymko/blog-post-reactions-service:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-password}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-6486b0fbf6b5271b735c1890af880484eec743795016378c6446758986179527}
     depends_on:
       database:
         condition: service_healthy
@@ -166,9 +166,9 @@ services:
     image: mmaksymko/blog-post-users-service:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-6486b0fbf6b5271b735c1890af880484eec743795016378c6446758986179527}
     depends_on:
       database:
         condition: service_healthy
@@ -191,7 +191,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       EMAIL_USERNAME: ${EMAIL_USERNAME}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-6486b0fbf6b5271b735c1890af880484eec743795016378c6446758986179527}
     depends_on:
       config-server:
         condition: service_healthy
@@ -210,9 +210,10 @@ services:
     image: mmaksymko/blog-post-images-service:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      MINIO_URL: ${MINIO_URL:-http://minio:9000/}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-access-key}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-secret-key}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-6486b0fbf6b5271b735c1890af880484eec743795016378c6446758986179527}
     depends_on:
       config-server:
         condition: service_healthy
@@ -249,7 +250,7 @@ services:
       - /docker/dаta:/root/redis
       - /docker/redis_data.conf:/usr/local/etc/redis/redis.conf
     environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-password}
       - REDIS_PORT=6379
       - REDIS_DATABASES=16
     networks:
@@ -269,11 +270,11 @@ services:
     volumes:
       - 'minio_data:/data'
     environment:
-      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
-      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
-      - MINIO_DEFAULT_BUCKETS=post-images
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY:-access-key}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY:-secret-key}
+      - MINIO_DEFAULT_BUCKETS=${MINIO_DEFAULT_BUCKETS:-post-images}
     healthcheck:
-      test: ["CMD", "sh", "-c", "mc alias set local http://localhost:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && mc admin info local"]
+      test: ["CMD", "sh", "-c", "mc alias set local http://localhost:9000 ${MINIO_ACCESS_KEY:-access-key} ${MINIO_SECRET_KEY:-secret-key} && mc admin info local"]
       interval: 30s
       timeout: 20s
       retries: 3
