@@ -2,42 +2,25 @@
 @import '../../variables.css';
 
 .home {
-    width: 100vw;
-    min-height: 100vh;
-    background-color: var(--primary-color);
-    margin: 0;
+    width: calc(100dvw - 16px);
 }
-
 
 .title {
-    font-size: 2rem;
-    text-align: center;
     margin: 1rem;
     padding: 1rem;
     font-weight: 700;
 }
 
-.slogan {
-    font-size: 1.5rem;
-    text-align: center;
-    margin: 1rem;
-    padding: 1rem;
-}
-
-
-.main-container {
-    color: var(--secondary-color);
-}
-
-.section-title {
-    font-size: 2rem;
+.load-more-posts {
     font-weight: 700;
-    /* margin: 4% 3% 1%; */
-    padding: 0 3.75% 0.25% 3.75%;
-    color: var(--secondary-color);
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+    font-size: 1.75rem;
 }
 
-.main-page-section,
-.section-title {
-    background-color: hsl(0, 0%, 98%);
+.load-more-posts:hover {
+    cursor: pointer;
+    text-shadow: 1px 1px 2px var(--secondary-color);
+    transform: translateY(-0.1rem);
 }

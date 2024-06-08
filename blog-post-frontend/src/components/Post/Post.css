@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
+@import '../../variables.css';
+
+.blog-post-container {
+    margin: 0 1rem;
+    width: 720px;
+    max-width: calc(100dvw - 32px);
+    box-shadow: 0 0 6px var(--secondary-color);
+    border-radius: 1rem;
+}
+
+.blog-post-header {
+    position: relative;
+}
+
+.blog-post-header-image {
+    border-radius: 1rem 1rem 0 0;
+    opacity: 0.3;
+    object-fit: cover;
+    max-height: 360px;
+    width: 100%;
+}
+
+.blog-post-title {
+    font-family: 'Prata', serif;
+    font-weight: 500;
+    font-size: 2rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 90%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+}
+
+.blog-post-description {
+    padding: 0.5rem 1rem 1rem 1rem;
+    font-size: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.blog-post-date {
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+.blog-post-container:hover {
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--secondary-color);
+    transform: translateY(-0.1rem);
+}
+
+.blog-post-author:hover {
+    opacity: 0.8;
+    font-weight: 600;
+    /* cursor: pointer; */
+}

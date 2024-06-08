@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
+@import '../../variables.css';
+
+.blog-posts-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 1rem auto 0 auto;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+}

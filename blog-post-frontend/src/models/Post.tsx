@@ -12,3 +12,7 @@ export interface PostResponse {
     postedAt: Date,
     headerImageURL: string
 }
+
+export interface SignedPost extends PostResponse {
+    authorName: string
+}
