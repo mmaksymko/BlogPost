@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
+@import '../../variables.css';
+
+.header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    z-index: 100;
+}
+
+.header>* {
+    flex: 1 1 0;
+}
+
+.header .title {
+    font-family: 'Prata', serif;
+    text-align: left;
+    font-size: 2rem;
+    color: var(--secondary-color);
+    user-select: none;
+    width: min-content;
+}
+
+.header .title:hover {
+    cursor: pointer;
+    color: black;
+}
+
+.header .title-container {
+    flex-direction: row-reverse;
+}
+
+.header .title-container,
+.profile-login-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.profile-text-container {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    cursor: pointer;
+    gap: 0.5rem;
+    color: var(--secondary-color);
+}
+
+.profile-login-container:hover {
+    color: black
+}
+
+.profile-text {
+    font-size: 1.75rem;
+    line-height: 2.5rem;
+    font-weight: 700;
+    margin-right: 3.5rem;
+    text-align: right;
+}
+
+.pfp {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 90%;
+}
