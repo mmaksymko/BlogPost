@@ -1,2 +1,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
 @import '../../variables.css';
+
+.home {
+    width: 100vw;
+    min-height: 100vh;
+    background-color: var(--primary-color);
+    margin: 0;
+}
+
+
+.title {
+    font-size: 2rem;
+    text-align: center;
+    margin: 1rem;
+    padding: 1rem;
+    font-weight: 700;
+}
+
+.slogan {
+    font-size: 1.5rem;
+    text-align: center;
+    margin: 1rem;
+    padding: 1rem;
+}
+
+
+.main-container {
+    color: var(--secondary-color);
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    /* margin: 4% 3% 1%; */
+    padding: 0 3.75% 0.25% 3.75%;
+    color: var(--secondary-color);
+}
+
+.main-page-section,
+.section-title {
+    background-color: hsl(0, 0%, 98%);
+}
