@@ -1,0 +1,18 @@
+:root {
+    --primary-color: hsl(60, 3%, 94%);
+    --primary-color-darker: hsl(60, 3%, 84%);
+    --secondary-color: hsl(199, 28%, 13%);
+    --secondary-color-lighter: hsl(199, 28%, 20%);
+    --secondary-color-lightest: hsl(199, 28%, 38%);
+    --background-color: hsl(186, 39%, 86%);
+    --background-color-darker: hsl(186, 39%, 72%);
+    --background-color-darkest: hsl(186, 20%, 55%);
+    --secondary-background-color: hsl(0, 7%, 89%);
+    --additional-color: hsl(173, 27%, 26%);
+    --additional-color-lighter: hsla(173, 27%, 26%, 0.706);
+    --additional-color-light: hsl(167, 8%, 77%);
+    --focus-color: hsl(4, 100%, 67%);
+    --focus-color-lighter: hsla(4, 100%, 67%, 0.631);
+    --containers-box-shadow: 0 0.15rem 0.15rem rgba(0, 0, 0, 0.1);
+    --containers-strong-box-shadow: 0 0.15rem 0.15rem rgba(0, 0, 0, 0.3);
+}
