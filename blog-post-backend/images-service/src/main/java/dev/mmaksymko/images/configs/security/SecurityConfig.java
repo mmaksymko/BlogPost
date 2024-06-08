@@ -24,6 +24,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/images/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .requestMatchers("/actuator/**", "/error", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
