@@ -31,7 +31,6 @@ public class JwtConfig {
         return token -> {
             Jwt jwt = jwtDecoder.decode(token);
             claims.setClaims(jwt.getClaims());
-            System.out.println(claims);
             return jwt;
         };
     }
