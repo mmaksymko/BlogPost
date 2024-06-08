@@ -2,7 +2,6 @@ package dev.mmaksymko.blogpost.services;
 
 import dev.mmaksymko.blogpost.dto.PostRequest;
 import dev.mmaksymko.blogpost.dto.PostResponse;
-import dev.mmaksymko.blogpost.dto.PostUpdateRequest;
 import dev.mmaksymko.blogpost.mappers.PostMapper;
 import dev.mmaksymko.blogpost.models.Post;
 import dev.mmaksymko.blogpost.repositories.PostRepository;
@@ -44,7 +43,6 @@ public class PostServiceTest {
     private Post post;
     private PostResponse postResponse;
     private PostRequest postRequest;
-    private PostUpdateRequest postUpdateRequest;
     private Pageable pageable;
 
     @BeforeEach
@@ -52,9 +50,8 @@ public class PostServiceTest {
         MockitoAnnotations.openMocks(this);
 
         post = Post.builder().title(TEST_TITLE).content(TEST_CONTENT).build();
-        postResponse = new PostResponse(1L, TEST_TITLE, TEST_CONTENT, 1L, null);
-        postRequest = new PostRequest(TEST_TITLE, TEST_CONTENT);
-        postUpdateRequest = new PostUpdateRequest(UPDATED_TITLE, UPDATED_CONTENT);
+        postResponse = new PostResponse(1L, TEST_TITLE, TEST_CONTENT, 1L, null, "");
+        postRequest = new PostRequest(TEST_TITLE, TEST_CONTENT, "");
         pageable = Pageable.unpaged();
     }
 
@@ -149,7 +146,7 @@ public class PostServiceTest {
             when(postRepository.save(any(Post.class))).thenReturn(post);
             when(postMapper.toResponse(post)).thenReturn(postResponse);
 
-            PostResponse result = postService.updatePost(id, postUpdateRequest);
+            PostResponse result = postService.updatePost(id, postRequest);
 
             assertEquals(postResponse, result);
             verify(postRepository, times(1)).findById(id);
@@ -164,7 +161,7 @@ public class PostServiceTest {
 
             when(postRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> postService.updatePost(id, postUpdateRequest));
+            assertThrows(NoSuchElementException.class, () -> postService.updatePost(id, postRequest));
 
             verify(postRepository, times(1)).findById(id);
         }

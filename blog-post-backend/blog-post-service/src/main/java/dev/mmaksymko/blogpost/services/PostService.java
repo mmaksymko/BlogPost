@@ -3,7 +3,6 @@ package dev.mmaksymko.blogpost.services;
 import dev.mmaksymko.blogpost.configs.security.Claims;
 import dev.mmaksymko.blogpost.dto.PostRequest;
 import dev.mmaksymko.blogpost.dto.PostResponse;
-import dev.mmaksymko.blogpost.dto.PostUpdateRequest;
 import dev.mmaksymko.blogpost.mappers.PostMapper;
 import dev.mmaksymko.blogpost.models.Post;
 import dev.mmaksymko.blogpost.repositories.PostRepository;
@@ -43,7 +42,10 @@ public class PostService {
     @Retry(name = "retry-post")
     public PostResponse addPost(PostRequest requestPost) {
         Post post = postMapper.toEntity(requestPost, getUserId());
-
+        System.out.println(post.getTitle());
+        System.out.println(post.getHeaderImageURL());
+        System.out.println(post.getAuthorId());
+        System.out.println(post.getContent());
         Post savedPost = postRepository.save(post);
 
         PostResponse postResponse = postMapper.toResponse(savedPost);
@@ -57,7 +59,7 @@ public class PostService {
     @Modifying
     @RateLimiter(name = "rate-limit-post")
     @Retry(name = "retry-post")
-    public PostResponse updatePost(Long id, PostUpdateRequest requestPost) {
+    public PostResponse updatePost(Long id, PostRequest requestPost) {
         Post retrievedPost = postRepository.findById(id).orElseThrow();
 
         if (!isUserAllowedToModify(retrievedPost.getAuthorId())) {
@@ -66,6 +68,7 @@ public class PostService {
 
         retrievedPost.setTitle(requestPost.title());
         retrievedPost.setContent(requestPost.content());
+        retrievedPost.setHeaderImageURL(requestPost.headerImageURL());
 
         Post savedPost = postRepository.save(retrievedPost);
 
