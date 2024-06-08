@@ -13,7 +13,7 @@ const Header: React.FC = ({ }) => {
         <footer className='footer'>
             <section className='footer-top-part'>
                 <section className='footer-left-part'>
-                    <span className='copyright'>© 2024</span> <span className="footer-title">BlogPost</span>
+                    <span className='copyright-sign'>©</span> <span className='copyright'>2024</span> <span className="footer-title">BlogPost</span>
                 </section>
                 <section className="footer-middle-part">
                     <FooterSvg className="footer-svg" />
