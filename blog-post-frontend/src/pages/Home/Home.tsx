@@ -27,7 +27,7 @@ const Home: React.FC = () => {
             const authorName = await fetchAuthorName(result.authorId);
             return {
                 ...result,
-                postedAt: new Date(result.postedAt),
+                postedAt: new Date(`${result.postedAt}Z`),
                 authorName
             };
         });

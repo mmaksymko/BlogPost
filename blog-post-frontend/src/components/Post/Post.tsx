@@ -19,7 +19,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
                 <Link to={`authors/${post.authorId}`}>
                     <span className="blog-post-author">{post.authorName}</span>
                 </Link>
-                <span className="blog-post-date">{post.postedAt.toUTCString()}</span>
+                <span className="blog-post-date">{post.postedAt.toLocaleString()}</span>
             </div>
         </div>
     );
