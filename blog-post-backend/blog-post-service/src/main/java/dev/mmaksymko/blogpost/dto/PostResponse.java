@@ -17,6 +17,7 @@ public class PostResponse {
     private String content;
     private Long authorId;
     private LocalDateTime postedAt;
+    private String headerImageURL;
 
     public PostResponse(PostResponse postResponse) {
         this.id = postResponse.id;
@@ -24,5 +25,6 @@ public class PostResponse {
         this.content = postResponse.content;
         this.authorId = postResponse.authorId;
         this.postedAt = postResponse.postedAt;
+        this.headerImageURL = postResponse.headerImageURL;
     }
 }

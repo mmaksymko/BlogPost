@@ -30,6 +30,9 @@ public class Post {
     @Column(name = "user_id", nullable = false)
     private Long authorId;
 
+    @Column(name = "header_image_url", nullable = false)
+    private String headerImageURL;
+
     @Column(name = "posted_at", updatable = false)
     @CreationTimestamp
     private LocalDateTime postedAt = LocalDateTime.now();

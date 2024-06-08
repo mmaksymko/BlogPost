@@ -6,5 +6,6 @@ import org.springframework.lang.NonNull;
 @Builder
 public record PostRequest(
     @NonNull String title,
-    @NonNull String content
+    @NonNull String content,
+    @NonNull String headerImageURL
 ) {}

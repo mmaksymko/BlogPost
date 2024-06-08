@@ -11,6 +11,7 @@ public class PostMapper {
         return PostResponse
                 .builder()
                 .id(post.getId())
+                .headerImageURL(post.getHeaderImageURL())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .authorId(post.getAuthorId())
@@ -21,6 +22,7 @@ public class PostMapper {
     public Post toEntity(PostRequest postRequest, Long authorId) {
         return Post
                 .builder()
+                .headerImageURL(postRequest.headerImageURL())
                 .title(postRequest.title())
                 .content(postRequest.content())
                 .authorId(authorId)
