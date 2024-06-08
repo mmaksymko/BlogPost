@@ -2,19 +2,18 @@
 @import '../../variables.css';
 
 .footer {
-    width: 100%;
-    align-items: center;
     z-index: 100;
+
+    width: 100vw;
+    height: 12rem;
+    padding: 1rem 0;
+
     background-color: var(--secondary-color);
     color: var(--primary-color);
-}
 
-.copyright-sign {
-    font-weight: 600;
-}
-
-.copyright {
-    font-weight: 500;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
 
 .footer-left-part {
@@ -24,18 +23,8 @@
 }
 
 .footer-svg {
-    fill: var(--primary-color);
-    width: 10rem;
-    height: 10rem;
-}
-
-.footer-top-part {
-    width: 100vw;
-    height: 12rem;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 1rem 0;
+    width: 11rem;
+    height: 11rem;
 }
 
 .footer-middle-part {
