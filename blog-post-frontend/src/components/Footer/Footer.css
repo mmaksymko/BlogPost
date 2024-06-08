@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
+@import '../../variables.css';
+
+.footer {
+    /* display: flex; */
+    width: 100%;
+    align-items: center;
+    z-index: 100;
+    /* margin-top: 3rem; */
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.copyright {
+    font-weight: 600;
+}
+
+.footer-left-part,
+.footer-right-part {
+    margin-top: 3rem;
+}
+
+.footer-left-part {
+    font-family: 'Prata', serif;
+    font-size: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+
+.footer-svg {
+    fill: var(--primary-color);
+    margin-top: 2rem;
+    margin-right: 3rem;
+    width: 17rem;
+    height: 17rem;
+}
+
+.footer-top-part {
+    width: 100vw;
+    height: 12rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: 2.2rem;
+}
+
+.footer-middle-part {
+    display: flex;
+    align-items: center;
+    z-index: 1
+}
+
+.social-icon {
+    font-size: 32px;
+    transition: linear 0.15s;
+}
+
+.social-icon:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    transition: linear 0.15s;
+}
