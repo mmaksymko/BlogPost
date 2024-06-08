@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 public class ImageService {
     private final MinioClient minioClient;
     private final MinioProperties minioProperties;
-    private final Claims claims;
 
     public byte[] getImage(String bucketName, String objectName) {
         try {
@@ -105,11 +104,11 @@ public class ImageService {
     }
 
     private String getHostFromUrl(String url) {
-        Pattern pattern = Pattern.compile("http://minio:(\\d+)/");
+        Pattern pattern = Pattern.compile("http://minio:(\\d+)");
         Matcher matcher = pattern.matcher(url);
 
         return matcher.find()
-                ? String.format("http://localhost:%s/", matcher.group(1))
+                ? String.format("http://localhost:%s", matcher.group(1))
                 : url;
     }
 
