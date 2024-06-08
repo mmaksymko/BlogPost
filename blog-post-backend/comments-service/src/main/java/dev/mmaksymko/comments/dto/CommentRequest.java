@@ -8,6 +8,5 @@ import org.springframework.lang.Nullable;
 public record CommentRequest(
     @NonNull Long postId,
     @Nullable Long parentCommentId,
-    @NonNull Long userId,
     @NonNull String content
 ) {}
