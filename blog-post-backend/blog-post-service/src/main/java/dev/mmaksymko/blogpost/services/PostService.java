@@ -42,10 +42,7 @@ public class PostService {
     @Retry(name = "retry-post")
     public PostResponse addPost(PostRequest requestPost) {
         Post post = postMapper.toEntity(requestPost, getUserId());
-        System.out.println(post.getTitle());
-        System.out.println(post.getHeaderImageURL());
-        System.out.println(post.getAuthorId());
-        System.out.println(post.getContent());
+
         Post savedPost = postRepository.save(post);
 
         PostResponse postResponse = postMapper.toResponse(savedPost);

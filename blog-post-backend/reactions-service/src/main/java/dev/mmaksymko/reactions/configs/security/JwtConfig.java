@@ -20,7 +20,7 @@ public class JwtConfig {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
-    private final Claims claims = new Claims();
+    private final Claims claims;
 
     @Bean
     public JwtDecoder jwtDecoder() {

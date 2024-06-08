@@ -52,7 +52,7 @@ public class CommentServiceTest {
         comment = new Comment();
         baseCommentResponse = new BaseCommentResponse();
         commentResponse = new CommentResponse(baseCommentResponse);
-        commentRequest = new CommentRequest(1L, null, 1L, "");
+        commentRequest = new CommentRequest(1L, null, "");
         post = new Post(commentRequest.postId(), "title", "content", 1L, LocalDateTime.now());
     }
 
@@ -156,7 +156,7 @@ public class CommentServiceTest {
         @DisplayName("Adds a new comment with no parentId")
         void testAddComment() {
             CommentResponse commentResponse = new CommentResponse(baseCommentResponse);
-            commentRequest = new CommentRequest(1L, null, 1L, "");
+            commentRequest = new CommentRequest(1L, null, "");
 
             when(postClient.getPost(any(Long.class))).thenReturn(post);
             when(commentMapper.toEntity(any(CommentRequest.class), isNull(), 1L)).thenReturn(comment);
@@ -167,7 +167,6 @@ public class CommentServiceTest {
             commentService.addComment(commentRequest);
 
             assertEquals(commentResponse.getPostId(), commentRequest.postId());
-            assertEquals(commentResponse.getUserId(), commentRequest.userId());
             assertEquals(commentResponse.getContent(), commentRequest.content());
 
             verify(commentMapper, times(1)).toEntity(any(CommentRequest.class), isNull(), 1L);
@@ -182,7 +181,7 @@ public class CommentServiceTest {
         @ValueSource(longs = {1L, Long.MAX_VALUE, Long.MIN_VALUE, 0})
         void testAddCommentWithDifferentParentIds(Long parentId) {
             CommentResponse commentResponse = new CommentResponse(baseCommentResponse);
-            commentRequest = new CommentRequest(1L, parentId, 1L, "");
+            commentRequest = new CommentRequest(1L, parentId, "");
 
             when(commentMapper.toEntity(any(CommentRequest.class), any(Comment.class), 1L)).thenReturn(comment);
             when(commentRepository.save(any(Comment.class))).thenReturn(comment);
@@ -193,7 +192,6 @@ public class CommentServiceTest {
             commentService.addComment(commentRequest);
 
             assertEquals(commentResponse.getPostId(), commentRequest.postId());
-            assertEquals(commentResponse.getUserId(), commentRequest.userId());
             assertEquals(commentResponse.getContent(), commentRequest.content());
 
             verify(commentMapper, times(1)).toEntity(any(CommentRequest.class), any(Comment.class), 1L);
