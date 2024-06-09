@@ -1,5 +1,5 @@
 export enum UserRole {
-    USER, ADMIN, SUPER_ADMIN
+    SUPER_ADMIN, ADMIN, USER, UNAUTHORIZED
 }
 
 export interface UserUpdateRequest {
@@ -9,11 +9,20 @@ export interface UserUpdateRequest {
 }
 
 export interface UserResponse {
-    id: number,
-    firstName: string,
-    lastName: string,
-    email: string,
-    role: UserRole;
-    registeredAt: Date;
-    pfpUrl: string
+    id: number | undefined,
+    firstName: string | undefined,
+    lastName: string | undefined,
+    email: string | undefined,
+    role: UserRole | undefined;
+    registeredAt: Date | undefined;
+    pfpUrl: string | undefined
+}
+
+export interface CurrentUser {
+    id: number | undefined,
+    firstName: string | undefined,
+    lastName: string | undefined,
+    email: string | undefined,
+    role: UserRole | undefined;
+    pfpUrl: string | undefined
 }
