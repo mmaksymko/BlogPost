@@ -23,7 +23,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/users/{id}", "/users/email/{email}/").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/{id}/", "/users/email/{email}/").permitAll()
                         .requestMatchers("/actuator/**", "/error", "/webjars/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/{id}", "/users/email/{email}/").permitAll()
                         .anyRequest().authenticated()
