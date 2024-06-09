@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(exchanges -> exchanges
+                    .pathMatchers("current-user/").authenticated()
                     .anyExchange().permitAll())
                 .oauth2Login(oauth2 -> oauth2.authenticationSuccessHandler(oAuth2LoginSuccessHandler))
                 .logout(logout -> logout.logoutSuccessHandler(OAuth2LogoutSuccessHandler))

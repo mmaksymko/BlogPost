@@ -54,7 +54,6 @@ public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHan
                 List.of(new SimpleGrantedAuthority(user.getRole().name()),
                         new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
                 oAuth2AuthenticationToken.getAuthorizedClientRegistrationId()))
-                .doOnNext(System.out::println)
                 .map(securityAuth -> {
                     SecurityContext securityContext = new SecurityContextImpl();
                     securityContext.setAuthentication(securityAuth);
