@@ -1,0 +1,17 @@
+.page-not-found-header {
+    text-align: center;
+}
+
+.no-page-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.no-page-image {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+}
