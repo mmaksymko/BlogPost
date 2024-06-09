@@ -1,5 +1,6 @@
 package dev.mmaksymko.gateway.handlers;
 
+import dev.mmaksymko.gateway.configs.FrontEndProperties;
 import dev.mmaksymko.gateway.configs.security.CurrentUserInfo;
 import dev.mmaksymko.gateway.models.User;
 import dev.mmaksymko.gateway.models.UserRole;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -21,6 +23,7 @@ import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.*;
 
 @Configuration
@@ -29,6 +32,7 @@ import java.util.*;
 public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHandler {
     private final UserService userService;
     private final CurrentUserInfo currentUserId;
+    private final FrontEndProperties frontEndProperties;
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
@@ -42,7 +46,12 @@ public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHan
                 .switchIfEmpty(Mono.defer(() -> userService
                             .createUser(getUserFromAttributes(attributes))
                             .doOnNext(user -> handleUserAuthentication(user, attributes, oAuth2AuthenticationToken).subscribe())
-                )).then();
+                ))
+                .then(Mono.fromRunnable(() -> {
+                    webFilterExchange.getExchange().getResponse().setStatusCode(HttpStatus.PERMANENT_REDIRECT);
+                    webFilterExchange.getExchange().getResponse().getHeaders().setLocation(URI.create(frontEndProperties.url() + "/oauth2/redirect"));
+                }))
+                .then(webFilterExchange.getExchange().getResponse().setComplete());
     }
 
     public Mono<Void> handleUserAuthentication(User user, Map<String, Object> attributes, OAuth2AuthenticationToken oAuth2AuthenticationToken) {
