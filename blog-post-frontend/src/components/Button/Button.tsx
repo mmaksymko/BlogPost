@@ -1,6 +1,6 @@
 import React from 'react';
 import './Button.css';
-import EastIcon from '@mui/icons-material/East';
+
 interface ButtonProps {
     onClick?: () => void;
     width?: string;
@@ -33,7 +33,6 @@ const Button: React.FC<ButtonProps> = ({ width, height = '4rem', onClick, childr
             style={style}
             disabled={disabled}>
             {children}
-            {/* <EastIcon /> */}
         </button>
     );
 };
