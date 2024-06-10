@@ -13,8 +13,6 @@ import axios from 'axios';
 import { serverURL } from './config';
 import NoPage from './pages/NoPage';
 import { AuthContext, unauthorizedUser, UserState } from './contexts/AuthContext';
-import PrivateRoute from './components/PrivateRoute';
-import { UserRole } from './models/User';
 import OAauthRedirectHandler from './pages/OAauthRedirectHandler';
 
 function App() {
@@ -37,15 +35,13 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* <Route path="login" element={<PrivateRoute requiredRole={UserRole.UNAUTHORIZED} path="login" element={<Profile />} />} />
-            <Route path="profile" element={<PrivateRoute requiredRole={UserRole.USER} path="profile" element={<Profile />} />} /> */}
             <Route path="oauth2/redirect" element={<OAauthRedirectHandler />} />
             <Route path="*" element={<NoPage />} />
           </Routes>
           <Footer />
         </BrowserRouter >
         <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} open={snack.open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity={snack.severity} variant="outlined" sx={{ background: "var(--primary-color)", width: '125%', maxWidth: "75vw" }}>
+          <Alert onClose={handleClose} severity={snack.severity} variant="standard" sx={{ width: '125%', maxWidth: "75vw" }}>
             {snack.message}
           </Alert>
         </Snackbar>
