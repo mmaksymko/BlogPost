@@ -30,3 +30,9 @@ code {
 .no-scroll {
   overflow: hidden;
 }
+
+.page-header-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-left: 2rem;
+}

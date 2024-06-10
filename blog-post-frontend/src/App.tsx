@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 import Home from "./pages/Home";
+import CreatePost from "./pages/CreatePost";
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -13,6 +14,8 @@ import axios from 'axios';
 import { serverURL } from './config';
 import NoPage from './pages/NoPage';
 import { AuthContext, unauthorizedUser, UserState } from './contexts/AuthContext';
+import PrivateRoute from './components/PrivateRoute';
+import { UserRole } from './models/User';
 import OAauthRedirectHandler from './pages/OAauthRedirectHandler';
 
 function App() {
@@ -35,6 +38,7 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/create-post" element={<PrivateRoute requiredRole={UserRole.USER} element={<CreatePost />} />} />
             <Route path="oauth2/redirect" element={<OAauthRedirectHandler />} />
             <Route path="*" element={<NoPage />} />
           </Routes>

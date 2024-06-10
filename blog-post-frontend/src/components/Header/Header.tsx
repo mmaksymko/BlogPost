@@ -12,6 +12,7 @@ import { UserRole } from '../../models/User';
 import { AuthContext, unauthorizedUser } from '../../contexts/AuthContext';
 import { serverURL } from '../../config';
 import Link from '../Link';
+import Button from '../Button';
 
 const Header: React.FC = () => {
     const location = useLocation()
@@ -30,7 +31,7 @@ const Header: React.FC = () => {
                 if (error.response && error.response.data.error === 'No value present') {
                     setUser(unauthorizedUser);
                 } else {
-                    console.error('Failed to check auth:', error);
+                    setUser(unauthorizedUser);
                 }
             }
         };
@@ -50,8 +51,8 @@ const Header: React.FC = () => {
                     {!role || role !== UserRole.UNAUTHORIZED
                         ?
                         <div className="profile-text-container">
+                            <Link to='/create-post'> <Button width='8rem' height='3rem' margin="0 1rem 0 0" outlined onClick={() => { }}>Додати</Button></Link>
                             {
-
                                 !pfpUrl ?
                                     <FaceIcon style={{ width: "2rem", height: "2rem" }} />
                                     :
@@ -65,24 +66,6 @@ const Header: React.FC = () => {
                             <p className="profile-text" onClick={handleLoginClick}>Увійти</p>
                         </div>
                     }
-                </section >
-            </header >
-        </>
-    );
-
-    return (
-        <>
-            <header className="header">
-                <div className="title-container">
-                    <Link to="/" className="title">
-                        BlogPost
-                    </Link>
-                </div>
-                <section className="profile-login-container">
-                    <div className="profile-text-container">
-                        <LoginIcon style={{ width: "2rem", height: "2rem" }} />
-                        <p className="profile-text">Увійти</p>
-                    </div>
                 </section >
             </header >
         </>
