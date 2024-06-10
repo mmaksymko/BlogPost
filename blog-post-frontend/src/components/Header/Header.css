@@ -26,6 +26,10 @@
     color: white;
 }
 
+.title:active {
+    text-shadow: var(--containers-box-shadow);
+}
+
 .header .title-container {
     flex-direction: row-reverse;
 }
@@ -46,8 +50,13 @@
     color: var(--secondary-color);
 }
 
-.profile-login-container:hover {
-    color: black
+.profile-login-container>*:hover {
+    color: white
+}
+
+
+.profile-login-container>*:active {
+    text-shadow: var(--containers-box-shadow);
 }
 
 .profile-text {
