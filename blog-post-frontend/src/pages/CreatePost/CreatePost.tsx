@@ -26,20 +26,27 @@ const CreatePost: React.FC = () => {
     const [inverted, setInverted] = useState(false);
 
     useEffect(() => {
-        wrapPreviewButton()
+        wrapPreviewButton(true)
     }, []);
 
     const openSnack = (severity: Severity, message: string) => {
         setSnackBar({ ...defaultSnackBar, open: true, severity: severity, message: message });
     }
 
-    const wrapPreviewButton = () => {
+    const wrapPreviewButton = (firstTime = false) => {
         const isWrapped = isContentWrapped('create-post-content');
 
         const previewButtonContainer = document.getElementsByClassName('preview-button-container')[0];
-        previewButtonContainer.classList.remove('preview-button-right', 'preview-button-below')
+        previewButtonContainer.classList.remove('preview-button-right', 'preview-button-below', 'no-margin-left')
 
-        previewButtonContainer.classList.add(isWrapped ? 'preview-button-below' : 'preview-button-right');
+        if (isWrapped) {
+            previewButtonContainer.classList.add('preview-button-below');
+        } else {
+            previewButtonContainer.classList.add('preview-button-right');
+            if (firstTime || showPreview) {
+                previewButtonContainer.classList.add('no-margin-left');
+            }
+        }
     }
 
     const isContentWrapped = (className: string): boolean => {

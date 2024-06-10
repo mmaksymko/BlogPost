@@ -23,9 +23,6 @@
     font-size: 1rem;
     font-family: 'Inter', 'Nunito Sans', sans-serif;
 
-    resize: none;
-    outline: none;
-
     border: none;
 
     width: 100%;
@@ -50,8 +47,6 @@
 
     border: 2px solid var(--secondary-color);
     border-radius: 1rem;
-
-    outline: none;
 }
 
 .post-textarea::-webkit-scrollbar-thumb,
@@ -169,4 +164,17 @@
     display: flex;
     justify-content: center;
     margin: 1rem 0 3rem 0;
+}
+
+.post-textarea-container:focus-within,
+.header-textarea:focus {
+    box-shadow: var(--containers-box-shadow);
+}
+
+.header-textarea:active {
+    box-shadow: var(--containers-strong-box-shadow);
+}
+
+.no-margin-left {
+    margin-left: 0rem;
 }

@@ -36,3 +36,8 @@ code {
   font-weight: 700;
   margin-left: 2rem;
 }
+
+textarea {
+  outline: none;
+  resize: none;
+}
