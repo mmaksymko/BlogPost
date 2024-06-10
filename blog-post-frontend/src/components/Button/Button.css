@@ -1,0 +1,61 @@
+@import '../../variables.css';
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+
+    width: 16rem;
+    position: relative;
+    z-index: 99;
+
+    font-family: inherit;
+    font-size: 1.4rem;
+    font-weight: 700;
+
+    border-radius: 20rem;
+    border: none;
+
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.button {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+.button:hover,
+.button:active {
+    cursor: pointer;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.button-inverted {
+    color: var(--primary-color);
+    background-color: var(--secondary-color);
+}
+
+.button-inverted:hover,
+.button-outlined {
+    color: var(--secondary-color);
+    background-color: var(--primary-color);
+    border: 3px solid var(--secondary-color);
+    box-shadow: 1px 1px 2px var(--secondary-color-lighter);
+}
+
+.button:disabled {
+    background-color: rgb(210, 209, 209);
+    color: var(--secondary-color);
+}
+
+.button:disabled:hover {
+    cursor: not-allowed;
+    border: none;
+}
+
+.button-no-shadow {
+    box-shadow: none;
+}
