@@ -13,7 +13,7 @@ const Posts: React.FC<PostsProps> = ({ posts }) => {
     return (
         <div className="blog-posts-container">
             {
-                posts.map(post => <Link to={`posts/${post.id}`}><Post post={post} key={`post ${post.id}`} /></Link>)
+                posts.map(post => <Link to={`posts/${post.id}`} key={`post ${post.id}`}><Post post={post} /></Link>)
             }
         </div >
     );
