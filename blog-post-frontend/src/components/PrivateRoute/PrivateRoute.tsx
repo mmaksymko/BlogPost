@@ -1,21 +1,43 @@
 import React, { useContext, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext, unauthorizedUser } from '../../contexts/AuthContext';
 import axios from 'axios';
 import { serverURL } from '../../config';
 import { UserRole } from '../../models/User';
 
 interface PrivateRouteProps {
-    path: string;
     element: React.ReactElement;
     requiredRole: UserRole;
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ requiredRole, element, path }) => {
-    const { role, id, fetchUser, handleLogin, setUser } = useContext(AuthContext);
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ requiredRole, element }) => {
+    const { setUser } = useContext(AuthContext);
     const [isAuthorized, setIsAuthorized] = React.useState(false);
-    const location = useLocation()
     const navigate = useNavigate();
+
+    var checkRole = (role: UserRole) => {
+        if (requiredRole === UserRole.UNAUTHORIZED) {
+            return true;
+        }
+
+        if (role === UserRole.UNAUTHORIZED) {
+            return false;
+        }
+
+        if (role === UserRole.SUPER_ADMIN) {
+            return true;
+        }
+
+        if (role === UserRole.ADMIN && requiredRole !== UserRole.SUPER_ADMIN) {
+            return true;
+        }
+
+        if (requiredRole === UserRole.USER && requiredRole === UserRole.USER) {
+            return true;
+        }
+
+        return false;
+    }
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -23,9 +45,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ requiredRole, element, path
                 const response = await axios.get(`${serverURL}/current-user/`, { withCredentials: true });
                 setUser({ ...response.data });
                 const role: UserRole = response.data.role
-                const authorized = (role === UserRole.SUPER_ADMIN) || (role === UserRole.ADMIN && requiredRole !== UserRole.SUPER_ADMIN) ||
-                    (role === UserRole.USER && (requiredRole === UserRole.USER || requiredRole === UserRole.UNAUTHORIZED)) ||
-                    (response.data.role === UserRole.UNAUTHORIZED && requiredRole === UserRole.UNAUTHORIZED)
+                const authorized = checkRole(role)
                 if (!authorized) {
                     navigate('/login')
                 }
