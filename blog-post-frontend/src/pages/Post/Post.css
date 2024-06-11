@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
+@import '../../variables.css';
+
+.post {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.post-header {
+    margin-bottom: 1rem;
+}
+
+.post-content,
+.post-comments,
+.post-under-header-section {
+    width: 720px;
+}
+
+.post-content {
+    padding-top: 1rem;
+    max-width: calc(100dvw - 32px);
+    border-radius: 1rem;
+}
+
+.post-under-header-section {
+    display: flex;
+    justify-content: space-between;
+}
+
+.reaction-icons,
+.modify-icons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.post-comments {
+    box-shadow: var(--containers-box-shadow);
+    margin: 1rem;
+    border-radius: 1rem;
+}

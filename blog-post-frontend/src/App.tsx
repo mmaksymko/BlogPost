@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 import Home from "./pages/Home";
+import Post from "./pages/Post";
 import CreatePost from "./pages/CreatePost";
 
 import Header from './components/Header';
@@ -38,6 +39,7 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/posts/:id" element={<Post />} />
             <Route path="/create-post" element={<PrivateRoute requiredRole={UserRole.USER} element={<CreatePost />} />} />
             <Route path="oauth2/redirect" element={<OAauthRedirectHandler />} />
             <Route path="*" element={<NoPage />} />
