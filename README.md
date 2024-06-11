@@ -23,7 +23,7 @@ The example is for **Gmail**, but you can use your prefered e-mail provider.
 		- `EMAIL_USERNAME` - your email address.
 		- `EMAIL_PASSWORD` - copied password.
 		- `EMAIL_HOST` - your e-mail providerss SMPT-address **(if you use Gmail you can skip this variable)**
-5. *(Optional) Set other variable to you liking, if they aren't set - default one's are being used:
+5. *(Optional)* Set other variable to you liking, if they aren't set - default one's are being used:
 	- `POSTGRES_USER`
 	- `POSTGRES_PASSWORD`
 	- `REDIS_PASSWORD`
