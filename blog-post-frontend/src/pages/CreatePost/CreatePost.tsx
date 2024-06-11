@@ -7,6 +7,7 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import { SnackBarContext, defaultSnackBar, Severity } from '../../contexts/SnackBarContext';
 import { addPost } from '../../api-calls/Post';
 import { addImage } from '../../api-calls/Image';
+import Markdown from '../../components/Markdown';
 
 const CreatePost: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -148,11 +149,11 @@ const CreatePost: React.FC = () => {
                     </div>
                 </div>
 
-                <ReactMarkdown
+
+                <Markdown
                     className={`${!showPreview ? 'invisible ' : ''}post-preview`}
-                >
-                    {content}
-                </ReactMarkdown>
+                    content={content}
+                />
             </div >
             <div className='create-post-button'>
                 <Button inverted onClick={createPost}>

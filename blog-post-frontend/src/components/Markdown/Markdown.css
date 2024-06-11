@@ -1,0 +1,9 @@
+@import '../../variables.css';
+
+.markdown {
+    font-family: 'Inter', 'Nunito Sans', sans-serif;
+}
+
+.katex .base {
+    padding-block: 6px;
+}
