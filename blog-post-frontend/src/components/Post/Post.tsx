@@ -6,11 +6,12 @@ import Link from '../Link'
 
 interface PostProps {
     post: SignedPost
+    clickable?: boolean
 }
 
-const Post: React.FC<PostProps> = ({ post }) => {
+const Post: React.FC<PostProps> = ({ post, clickable = true }) => {
     return (
-        <div className="blog-post-container">
+        <div className={`${clickable ? "clickable " : ""} blog-post-container`}>
             <div className="blog-post-header">
                 <img className="blog-post-header-image" src={post.headerImageURL}></img>
                 <span className="blog-post-title">{post.title}</span>
