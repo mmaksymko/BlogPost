@@ -1,3 +1,5 @@
+import { UserResponse } from "./User";
+
 export interface CommentRequest {
     postId: number,
     parentCommentId: number,
@@ -29,4 +31,8 @@ export interface ParentlessCommentResponse extends BaseCommentResponse {
 export interface CommentResponse extends BaseCommentResponse {
     parentComment: ChildlessCommentResponse;
     subComments: ParentlessCommentResponse[];
+}
+
+export interface SignedComment extends CommentResponse {
+    user: UserResponse;
 }
