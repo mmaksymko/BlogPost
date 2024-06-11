@@ -3,16 +3,14 @@ import { useLocation } from 'react-router-dom';
 
 import './Header.css';
 
-import axios from 'axios';
-
 import LoginIcon from '@mui/icons-material/Login';
 import FaceIcon from '@mui/icons-material/Face';
 
 import { UserRole } from '../../models/User';
 import { AuthContext, unauthorizedUser } from '../../contexts/AuthContext';
-import { serverURL } from '../../config';
 import Link from '../Link';
 import Button from '../Button';
+import { getCurrentUser } from '../../api-calls/User';
 
 const Header: React.FC = () => {
     const location = useLocation()
@@ -24,15 +22,12 @@ const Header: React.FC = () => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            try {
-                const response = await axios.get(`${serverURL}/current-user/`, { withCredentials: true });
-                setUser({ ...response.data });
-            } catch (error: any) {
-                if (error.response && error.response.data.error === 'No value present') {
-                    setUser(unauthorizedUser);
-                } else {
-                    setUser(unauthorizedUser);
-                }
+            const onSuccess = (response: any) => response.data;
+            const onError = () => setUser(unauthorizedUser);
+
+            const response = await getCurrentUser(onSuccess, onError);
+            if (response) {
+                setUser({ ...response });
             }
         };
 

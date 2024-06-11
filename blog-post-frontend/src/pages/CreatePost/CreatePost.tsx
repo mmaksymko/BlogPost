@@ -4,11 +4,9 @@ import './CreatePost.css';
 
 import Button from '../../components/Button';
 import PreviewIcon from '@mui/icons-material/Preview';
-import ReactMarkdown from 'react-markdown';
-import axios from 'axios';
 import { SnackBarContext, defaultSnackBar, Severity } from '../../contexts/SnackBarContext';
-import { PostRequest, PostResponse } from '../../models/Post';
-import { serverURL } from '../../config';
+import { addPost } from '../../api-calls/Post';
+import { addImage } from '../../api-calls/Image';
 
 const CreatePost: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,25 +83,12 @@ const CreatePost: React.FC = () => {
     const createPost = async () => {
         if (!headerImage) return;
 
-        try {
-            const imageFormData = new FormData()
-            imageFormData.append('file', headerImage);
-            const imageResponse = await axios.post<string>(`${serverURL}/images-service/images/headers/`, imageFormData, { withCredentials: true });
+        const imageURL = await addImage(headerImage, openSnack);
+        if (!imageURL) return;
 
-            const postRequestBody: PostRequest = {
-                title: title,
-                content: content,
-                headerImageURL: imageResponse.data
-            }
+        const response = await addPost(title, content, imageURL, openSnack);
 
-            const response = await axios.post<PostResponse>(`${serverURL}/blog-post-service/posts/`, postRequestBody, { withCredentials: true });
-            openSnack('success', 'Пост успішно створено!');
-            navigate('/posts/' + response.data.id);
-        } catch (error: any) {
-            console.log(error.response?.data)
-            console.error('Error fetching data: ', error);
-            openSnack('error', `Помилка створення ${error.response?.data.error}`);
-        }
+        navigate('/posts/' + response?.id);
     }
 
     return (

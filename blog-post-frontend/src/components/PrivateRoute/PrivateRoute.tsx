@@ -1,9 +1,8 @@
 import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext, unauthorizedUser } from '../../contexts/AuthContext';
-import axios from 'axios';
-import { serverURL } from '../../config';
 import { UserRole } from '../../models/User';
+import { getCurrentUser } from '../../api-calls/User';
 
 interface PrivateRouteProps {
     element: React.ReactElement;
@@ -41,22 +40,23 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ requiredRole, element }) =>
 
     useEffect(() => {
         const checkAuth = async () => {
-            try {
-                const response = await axios.get(`${serverURL}/current-user/`, { withCredentials: true });
-                setUser({ ...response.data });
-                const role: UserRole = response.data.role
-                const authorized = checkRole(role)
-                if (!authorized) {
-                    navigate('/login')
-                }
-                setIsAuthorized(authorized);
-            } catch (error: any) {
+            const onSuccess = (response: any) => response.data;
+            const onError = (error: any) => {
                 if (error.response && error.response.data.error === 'No value present') {
                     setUser(unauthorizedUser);
                 } else {
                     console.error('Failed to check auth:', error);
                 }
             }
+            const response = await getCurrentUser(onSuccess, onError);
+
+            setUser({ ...response });
+            const role: UserRole = response.role
+            const authorized = checkRole(role)
+            if (!authorized) {
+                navigate('/login')
+            }
+            setIsAuthorized(authorized);
         };
 
         checkAuth();

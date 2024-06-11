@@ -1,8 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { serverURL } from '../../config';
-import axios from 'axios';
+import { getCurrentUser } from '../../api-calls/User';
 
 const Login: React.FC = () => {
     const { handleLogin } = useContext(AuthContext);
@@ -11,13 +10,10 @@ const Login: React.FC = () => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            try {
-                await axios.get(`${serverURL}/current-user/`, { withCredentials: true });
+            const onSuccess = () => navigate('/profile');
+            const onError = () => handleLogin(location.pathname);
 
-                navigate('/profile')
-            } catch (error: any) {
-                handleLogin(location.pathname);
-            }
+            await getCurrentUser(onSuccess, onError);
         };
 
         checkAuth();

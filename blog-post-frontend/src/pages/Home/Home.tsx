@@ -1,28 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import './Home.css';
-import axios from 'axios';
-import { serverURL } from '../../config';
 import { PostResponse, SignedPost } from '../../models/Post';
 import Posts from '../../components/Posts';
+import { SnackBarContext, defaultSnackBar, Severity } from '../../contexts/SnackBarContext';
+import { getPosts } from '../../api-calls/Post';
+import { getUser } from '../../api-calls/User';
 
 const Home: React.FC = () => {
     const [posts, setPosts] = useState<SignedPost[]>([]);
     const [last, setLast] = useState(false);
     const [page, setPage] = useState(0);
 
+    const { setSnackBar } = useContext(SnackBarContext);
+    const openSnack = (severity: Severity, message: string) => {
+        setSnackBar({ ...defaultSnackBar, open: true, severity: severity, message: message });
+    }
+
     const fetchAuthorName = (authorId: number) => {
-        return axios.get(`${serverURL}/users-service/users/${authorId}/`, { withCredentials: true }).then(response => {
-            const data = response.data
-            return data.firstName + " " + data.lastName;
-        }).catch(error => {
-            console.error(error);
-            return "Unknown";
-        });
+        const onSuccess = (response: any) => response.data.firstName + " " + response.data.lastName;
+        const onError = () => "Unknown"
+
+        return getUser(authorId, onSuccess, onError);
     }
 
     const fetchPosts = async () => {
-        const response = await axios.get(`${serverURL}/blog-post-service/posts/?size=10&page=${page}`, { withCredentials: true });
-        const data = response.data;
+        const data = await getPosts(page, openSnack);
+
         const promises = data.content.map(async (result: PostResponse) => {
             const authorName = await fetchAuthorName(result.authorId);
             return {
@@ -32,7 +35,6 @@ const Home: React.FC = () => {
             };
         });
         const postsWithDateObjects = await Promise.all(promises);
-        console.log(postsWithDateObjects);
 
         setPosts(prevPosts => [...prevPosts, ...postsWithDateObjects]);
         setLast(data.last);
