@@ -1,5 +1,6 @@
 package dev.mmaksymko.comments.configs.security;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,8 @@ public class JwtConfig {
     @Value("${jwt.secret}")
     private String jwtSecret;
     private final Claims claims;
+    @Getter
+    private String tokenValue;
 
     @Bean
     public JwtDecoder jwtDecoder() {
@@ -30,6 +33,7 @@ public class JwtConfig {
 
         return token -> {
             Jwt jwt = jwtDecoder.decode(token);
+            this.tokenValue = token;
             claims.setClaims(jwt.getClaims());
             return jwt;
         };
