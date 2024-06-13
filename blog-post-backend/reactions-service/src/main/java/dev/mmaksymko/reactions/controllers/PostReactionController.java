@@ -43,8 +43,8 @@ public class PostReactionController {
         return postReactionService.updatePostReaction(postReaction);
     }
 
-    @DeleteMapping("{postId}/{userId}/")
-    public void deletePostReaction(@PathVariable Long postId, @PathVariable Long userId) {
-        postReactionService.deletePostReaction(postId, userId);
+    @DeleteMapping("{postId}/")
+    public void deletePostReaction(@PathVariable Long postId) {
+        postReactionService.deletePostReaction(postId);
     }
 }

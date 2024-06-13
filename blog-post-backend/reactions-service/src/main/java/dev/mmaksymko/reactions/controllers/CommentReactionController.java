@@ -43,8 +43,8 @@ public class CommentReactionController {
         return commentReactionService.updateCommentReaction(commentReaction);
     }
 
-    @DeleteMapping("{commentId}/{userId}/")
-    public void deleteCommentReaction(@PathVariable Long commentId, @PathVariable Long userId) {
-        commentReactionService.deleteCommentReaction(commentId, userId);
+    @DeleteMapping("{commentId}/")
+    public void deleteCommentReaction(@PathVariable Long commentId) {
+        commentReactionService.deleteCommentReaction(commentId);
     }
 }

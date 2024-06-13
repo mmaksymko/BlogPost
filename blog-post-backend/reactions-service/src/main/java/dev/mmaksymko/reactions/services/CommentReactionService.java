@@ -114,10 +114,8 @@ public class CommentReactionService {
     @Modifying
     @Retry(name = "retry-reaction")
     @RateLimiter(name = "rate-limit-reaction")
-    public void deleteCommentReaction(Long commentId, Long userId) {
-        if (!isUserAllowedToModify(userId)) {
-            throw new ForbiddenException("You are not allowed to delete this reaction");
-        }
+    public void deleteCommentReaction(Long commentId) {
+        Long userId = getUserId();
 
         var reactionId = CommentReaction
                 .CommentReactionId
