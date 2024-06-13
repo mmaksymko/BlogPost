@@ -54,15 +54,22 @@ public class CommentReactionService {
                 ));
     }
 
-    public CommentReactionResponse getCommentReaction(Long commentId, Long userId) {
+    public CommentReactionResponse getCommentReaction(Long commentId) {
         var reactionId = CommentReaction
                 .CommentReactionId
                 .builder()
                 .commentId(commentId)
-                .userId(userId)
+                .userId(getUserId())
                 .build();
 
-        CommentReaction reaction = commentReactionRepository.findById(reactionId).orElseThrow();
+        CommentReaction reaction = commentReactionRepository
+                .findById(reactionId)
+                .orElse(CommentReaction
+                    .builder()
+                    .reactionType(null)
+                    .id(reactionId)
+                    .build()
+                );
 
         return commentReactionMapper.toResponse(reaction);
     }

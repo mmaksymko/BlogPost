@@ -21,9 +21,9 @@ public class PostReactionController {
         return postReactionService.getPostReactions(postId, pageable);
     }
 
-    @GetMapping("{postId}/{userId}/")
-    public PostReactionResponse getPostReaction(@PathVariable Long postId, @PathVariable Long userId) {
-        return postReactionService.getPostReaction(postId, userId);
+    @GetMapping("{postId}/my-reaction/")
+    public PostReactionResponse getPostReaction(@PathVariable Long postId) {
+        return postReactionService.getPostReaction(postId);
     }
 
     @GetMapping("{postId}/count/")

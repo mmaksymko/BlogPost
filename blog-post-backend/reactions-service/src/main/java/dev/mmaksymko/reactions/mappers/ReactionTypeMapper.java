@@ -28,6 +28,9 @@ public class ReactionTypeMapper {
     }
 
     public ReactionTypeResponse toResponse(ReactionType reaction) {
+        if (reaction == null) {
+            return null;
+        }
         return ReactionTypeResponse
                 .builder()
                 .id(reaction.getId())

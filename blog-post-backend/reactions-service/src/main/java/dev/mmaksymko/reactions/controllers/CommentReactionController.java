@@ -21,9 +21,9 @@ public class CommentReactionController {
         return commentReactionService.getCommentReactions(commentId, pageable);
     }
 
-    @GetMapping("{commentId}/{userId}/")
-    public CommentReactionResponse getCommentReaction(@PathVariable Long commentId, @PathVariable Long userId) {
-        return commentReactionService.getCommentReaction(commentId, userId);
+    @GetMapping("{commentId}/my-reaction/")
+    public CommentReactionResponse getCommentReaction(@PathVariable Long commentId) {
+        return commentReactionService.getCommentReaction(commentId);
     }
 
     @GetMapping("{commentId}/count/")

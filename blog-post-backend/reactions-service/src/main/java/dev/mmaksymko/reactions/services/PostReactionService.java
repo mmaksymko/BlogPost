@@ -54,15 +54,22 @@ public class PostReactionService {
                 ));
     }
 
-    public PostReactionResponse getPostReaction(Long commentId, Long userId) {
+    public PostReactionResponse getPostReaction(Long commentId) {
         var reactionId = PostReaction
                 .PostReactionId
                 .builder()
                 .postId(commentId)
-                .userId(userId)
+                .userId(getUserId())
                 .build();
 
-        PostReaction reaction = postReactionRepository.findById(reactionId).orElseThrow();
+        PostReaction reaction = postReactionRepository
+                .findById(reactionId)
+                .orElse(PostReaction
+                        .builder()
+                        .reactionType(null)
+                        .id(reactionId)
+                        .build()
+                );
 
         return postReactionMapper.toResponse(reaction);
     }
