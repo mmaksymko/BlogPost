@@ -26,5 +26,33 @@ export interface Page<T> {
     };
     first: boolean;
     empty: boolean;
+}
 
+export const emptyPage: Page<any> = {
+    content: [],
+    pageable: {
+        pageNumber: 0,
+        pageSize: 20,
+        sort: {
+            unsorted: true,
+            sorted: false,
+            empty: true
+        },
+        offset: 0,
+        unpaged: false,
+        paged: true
+    },
+    totalPages: 0,
+    totalElements: 0,
+    last: true,
+    numberOfElements: 0,
+    size: 20,
+    number: 0,
+    sort: {
+        unsorted: true,
+        sorted: false,
+        empty: true
+    },
+    first: true,
+    empty: true
 }

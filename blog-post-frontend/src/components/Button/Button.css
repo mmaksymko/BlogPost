@@ -47,7 +47,7 @@
 }
 
 .button:disabled {
-    background-color: rgb(210, 209, 209);
+    background-color: var(--greyish-color);
     color: var(--secondary-color);
 }
 

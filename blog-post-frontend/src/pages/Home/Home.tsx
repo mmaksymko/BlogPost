@@ -47,7 +47,7 @@ const Home: React.FC = () => {
     return (
         <div className="home">
             <Posts posts={posts} />
-            {!last && <div className="load-more-posts" onClick={fetchPosts}>Load more...</div>}
+            {!last && <div className="home-load load-more-posts" onClick={fetchPosts}>Load more...</div>}
         </div>
     );
 };

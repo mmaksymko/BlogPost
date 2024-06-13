@@ -4,4 +4,5 @@
     --secondary-color-lighter: hsl(199, 28%, 20%);
     --containers-box-shadow: 0 0 6px var(--secondary-color);
     --containers-strong-box-shadow: 0 0 6px var(--secondary-color);
+    --greyish-color: rgb(210, 209, 209)
 }

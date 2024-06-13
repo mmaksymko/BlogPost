@@ -10,22 +10,40 @@ import { getPost } from '../../api-calls/Post';
 import { getUser } from '../../api-calls/User';
 import PostComponent from '../../components/Post';
 
-import Divider from '@mui/material/Divider';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
 import Button from '../../components/Button';
+import Comment from '../../components/Comment';
 import { AuthContext } from '../../contexts/AuthContext';
-import { UserRole } from '../../models/User';
-import { SignedComment } from '../../models/Comment';
+import { UserResponse, UserRole } from '../../models/User';
+import { BaseCommentResponse, ChildlessCommentResponse, CommentResponse, ParentlessCommentResponse, SignedBaseCommentResponse, SignedChildlessCommentResponse, SignedComment, SignedParentlessCommentResponse } from '../../models/Comment';
+import { Page, emptyPage } from '../../models/Page';
+import { addComment, getComments } from '../../api-calls/Comment';
+import SendIcon from '@mui/icons-material/Send';
+import CommentBox from '../../components/CommentBox';
+import { getCommentReactionCount, getUserReaction } from '../../api-calls/CommentReaction';
 
+interface AuthorData {
+    name: string;
+    pfp: string;
+};
+
+interface AuthorInfo extends AuthorData {
+    id: number
+};
 
 const Post: React.FC = () => {
     const { id: postId } = useParams<{ id: string }>();
     const [post, setPost] = useState<SignedPost | null>(null);
-    const [comments, setComments] = useState<SignedComment[] | null>(null);
+    const [commentContent, setCommentContent] = useState('');
+    const [last, setLast] = useState(false);
+
+
+    const [commentsPage, setCommentsPage] = useState<Page<CommentResponse>>(emptyPage)
+    const [comments, setComments] = useState<SignedComment[]>([]);
 
     const { id, role } = useContext(AuthContext);
 
@@ -36,7 +54,113 @@ const Post: React.FC = () => {
 
     useEffect(() => {
         fetchPost();
+        fetchComments();
     }, []);
+
+    const fetchAuthorNameAndPfp = (authorId: number): Promise<AuthorInfo> => {
+        const onSuccess = (response: any): AuthorInfo => ({
+            id: authorId,
+            name: response.data.firstName + " " + response.data.lastName,
+            pfp: response.data.pfpUrl
+        });
+        const onError = () => ({
+            id: authorId,
+            name: "DELETED",
+            pfp: ""
+        })
+
+        return getUser(authorId, onSuccess, onError);
+    }
+
+    const getMyReaction = async (commentId: number) => {
+        const reaction = (await getUserReaction(commentId, openSnack)).reaction
+        return reaction?.name
+    }
+
+    const getReactions = async (commentId: number) => {
+        return await getCommentReactionCount(commentId, openSnack);
+    }
+
+    const mapToSignedBaseComment = async (comment: BaseCommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedBaseCommentResponse> => {
+        const reactions = await getReactions(comment.commentId);
+        const myReaction = await getMyReaction(comment.commentId);
+        return {
+            ...comment,
+            authorName: authorsMap[comment.userId].name,
+            authorPfpUrl: authorsMap[comment.userId].pfp,
+            likes: reactions.LIKE,
+            dislikes: reactions.DISLIKE,
+            myReaction: myReaction
+        };
+    };
+
+    const mapToSignedChildlessComment = async (comment: ChildlessCommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedChildlessCommentResponse> => {
+        const baseComment = await mapToSignedBaseComment(comment, authorsMap);
+        return {
+            ...baseComment,
+            parentComment: comment.parentComment ? await mapToSignedChildlessComment(comment.parentComment, authorsMap) : null
+        };
+    };
+
+    const mapToSignedParentlessComment = async (comment: ParentlessCommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedParentlessCommentResponse> => {
+        const baseComment = await mapToSignedBaseComment(comment, authorsMap);
+        return {
+            ...baseComment,
+            subComments: await Promise.all(comment.subComments.map(subComment => mapToSignedParentlessComment(subComment, authorsMap)))
+        };
+    };
+
+    const mapToSignedComment = async (comment: CommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedComment> => {
+        const baseComment = await mapToSignedBaseComment(comment, authorsMap);
+        return {
+            ...baseComment,
+            parentComment: comment.parentComment ? await mapToSignedChildlessComment(comment.parentComment, authorsMap) : null,
+            subComments: await Promise.all(comment.subComments.map(subComment => mapToSignedParentlessComment(subComment, authorsMap)))
+        };
+    };
+
+    const extractUserIds = (comment: CommentResponse): number[] => {
+        let ids = [comment.userId];
+
+        if (comment.subComments) {
+            for (let subComment of comment.subComments) {
+                ids = [...ids, ...extractUserIds(subComment as CommentResponse)];
+            }
+        }
+
+        if (comment.parentComment) {
+            ids = [...ids, ...extractUserIds(comment.parentComment as CommentResponse)];
+        }
+
+        return ids;
+    }
+
+    const fetchComments = async () => {
+        if (!postId) return;
+
+        const page = await getComments(postId, commentsPage.pageable.pageNumber, openSnack)
+        if (!page) return;
+
+        setLast(page.last);
+        page.pageable.pageNumber++
+        setCommentsPage(page);
+
+        const comments = page.content
+
+        const userIds = comments.flatMap(extractUserIds)
+            .filter((value, index, self) => self.indexOf(value) === index);
+
+        const authors = await Promise.all(userIds.map(async userId => await fetchAuthorNameAndPfp(userId)));
+
+        const authorsMap: Record<number, AuthorData> = authors.reduce((map, author) => {
+            map[author.id] = { name: author.name, pfp: author.pfp };
+            return map;
+        }, {} as Record<number, AuthorData>);
+
+        const signedComments = await Promise.all(comments.map(comment => mapToSignedComment(comment, authorsMap)));
+
+        setComments(prevComments => [...prevComments, ...signedComments]);
+    }
 
     const fetchPost = async () => {
         if (!postId) return;
@@ -46,12 +170,39 @@ const Post: React.FC = () => {
 
         const onSuccess = (response: any) => response.data.firstName + " " + response.data.lastName
         const onError = (error: any) => setSnackBar({ ...defaultSnackBar, open: true, severity: "error", message: `Failed to fetch author name! ${error.response.data.error}` });
-        const authorName = await getUser(post.authorId, onSuccess, onError);
+        const authorName: string = await getUser(post.authorId, onSuccess, onError);
 
         setPost({
             ...post,
             authorName
         });
+    }
+
+    const handleCommentAdding = async () => {
+        if (!postId) return;
+
+        const comment = await addComment(parseInt(postId), null, commentContent, openSnack)
+
+        if (!comment) return;
+
+        const userIds = [comment].flatMap(extractUserIds)
+            .filter((value, index, self) => self.indexOf(value) === index);
+
+        const authors = await Promise.all(userIds.map(async userId => await fetchAuthorNameAndPfp(userId)));
+
+        const authorsMap: Record<number, AuthorData> = authors.reduce((map, author) => {
+            map[author.id] = { name: author.name, pfp: author.pfp };
+            return map;
+        }, {} as Record<number, AuthorData>);
+
+        const signedComments = await Promise.all([comment].map(comm => mapToSignedComment(comm, authorsMap)));
+        setComments(prevComments => [...signedComments, ...prevComments]);
+
+        commentsPage.totalElements++
+    }
+
+    const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setCommentContent(event.target.value);
     }
 
     return (
@@ -83,9 +234,16 @@ const Post: React.FC = () => {
             </section>
             <Markdown className="post-content" content={post?.content} />
             <div className='post-comments'>
-                <div className='page-header-title'>
-                    Коментарі ({ })
+                <div className='page-header-title font-size-1-5rem'>
+                    Коментарі ({commentsPage.totalElements})
                 </div>
+                <div className='comment-box-container'>
+                    <CommentBox minRows={2} maxRows={6} placeholder='Напишіть коментар...' onChange={handleTextareaChange} onClick={handleCommentAdding} />
+                </div>
+                <div className='comments-container'>
+                    {comments.map(comment => <Comment comment={comment} key={comment.commentId} />)}
+                </div>
+                {!last && <div className="load-more-posts" onClick={fetchComments}>Load more...</div>}
             </div>
         </div>
     );

@@ -1,0 +1,91 @@
+@import '../../variables.css';
+
+.comment {
+    margin: 1rem 0 1rem 1.25rem;
+    font-family: 'Inter', 'Nunito Sans', sans-serif;
+    position: relative;
+}
+
+.reactions-icon {
+    margin-right: 0.5rem;
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.active,
+.reactions-icon:hover {
+    cursor: pointer;
+    scale: 1.05;
+    color: var(--secondary-color);
+}
+
+.comment-container {
+    display: flex;
+    gap: 1rem;
+    /* position: relative; */
+    /* width: 100% */
+}
+
+.comment-author-section {
+    display: flex;
+    color: var(--greyish-color);
+    opacity: 0.5;
+}
+
+.comment-author-section>*::before {
+    margin: 0 0.5rem;
+    content: '᛫';
+    color: white;
+}
+
+.comment-author-section> :first-child::before {
+    content: '';
+    margin: 0;
+}
+
+.top-comment-right-section {
+    width: 100%
+}
+
+.top-comment-section {
+    margin-bottom: 0.15rem;
+}
+
+.comments-reactions {
+    display: flex;
+    gap: 3rem;
+    margin-top: 0.5rem;
+    align-items: center;
+}
+
+.comment-reaction>span {
+    position: absolute;
+    line-height: 1.75rem;
+}
+
+.wrap-text {
+    font-style: italic;
+    color: var(--greyish-color);
+}
+
+.comment-container::before {
+    content: '';
+    position: absolute;
+    left: calc(1rem - 1px);
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--greyish-color);
+    opacity: 0.1;
+}
+
+.comment-controls {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modification-icons {
+    display: flex;
+    gap: 1rem;
+}

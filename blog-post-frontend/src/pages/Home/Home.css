@@ -11,12 +11,8 @@
     font-weight: 700;
 }
 
-.load-more-posts {
-    font-weight: 700;
-    display: flex;
-    justify-content: center;
+.home-load {
     margin-bottom: 3rem;
-    font-size: 1.75rem;
 }
 
 .load-more-posts:hover {

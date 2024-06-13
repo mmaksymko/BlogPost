@@ -37,6 +37,21 @@ code {
   margin-left: 2rem;
 }
 
+.pfp {
+  position: relative;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 90%;
+  z-index: 10;
+}
+
+.load-more-posts {
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  font-size: 1.75rem;
+}
+
 textarea {
   outline: none;
   resize: none;

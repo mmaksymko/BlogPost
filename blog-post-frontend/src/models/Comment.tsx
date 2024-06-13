@@ -1,8 +1,6 @@
-import { UserResponse } from "./User";
-
 export interface CommentRequest {
     postId: number,
-    parentCommentId: number,
+    parentCommentId: number | null,
     content: string;
 }
 
@@ -29,10 +27,30 @@ export interface ParentlessCommentResponse extends BaseCommentResponse {
 }
 
 export interface CommentResponse extends BaseCommentResponse {
-    parentComment: ChildlessCommentResponse;
+    parentComment: ChildlessCommentResponse | null;
     subComments: ParentlessCommentResponse[];
 }
 
-export interface SignedComment extends CommentResponse {
-    user: UserResponse;
+interface Signed {
+    authorName: string;
+    authorPfpUrl: string;
+}
+
+export interface SignedBaseCommentResponse extends BaseCommentResponse, Signed {
+    likes: number;
+    dislikes: number;
+    myReaction: string | null;
+}
+
+export interface SignedChildlessCommentResponse extends SignedBaseCommentResponse {
+    parentComment: SignedChildlessCommentResponse | null;
+}
+
+export interface SignedParentlessCommentResponse extends SignedBaseCommentResponse {
+    subComments: SignedParentlessCommentResponse[];
+}
+
+export interface SignedComment extends SignedBaseCommentResponse {
+    parentComment: SignedChildlessCommentResponse | null;
+    subComments: SignedParentlessCommentResponse[];
 }

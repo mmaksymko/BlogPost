@@ -37,6 +37,19 @@
 
 .post-comments {
     box-shadow: var(--containers-box-shadow);
-    margin: 1rem;
+    margin: 3rem 1rem;
     border-radius: 1rem;
+    padding: 1rem 0;
+}
+
+.font-size-1-5rem {
+    font-size: 1.5rem;
+}
+
+.comment-box-container {
+    margin: 1.25rem 0 2.25rem 0;
+}
+
+.comments-container {
+    padding-right: 1.25rem;
 }
