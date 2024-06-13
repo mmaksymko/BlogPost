@@ -1,6 +1,7 @@
 package dev.mmaksymko.comments.services;
 
 import dev.mmaksymko.comments.clients.PostClient;
+import dev.mmaksymko.comments.configs.exceptions.ForbiddenException;
 import dev.mmaksymko.comments.configs.exceptions.ResourceGoneException;
 import dev.mmaksymko.comments.configs.security.Claims;
 import dev.mmaksymko.comments.dto.BaseCommentResponse;
@@ -105,10 +106,13 @@ public class CommentService {
     public void deleteComment(Long id) {
         Comment retrievedComment = commentRepository.findById(id).orElseThrow();
 
+        System.out.println(retrievedComment.getUserId());
+        System.out.println(claims.getClaim("id"));
+
         if (retrievedComment.getIsDeleted()) {
             throw new ResourceGoneException("Comment is already deleted");
         } else if (!isUserAllowedToModify(retrievedComment.getUserId())) {
-            throw new ResourceGoneException("User is not allowed to modify this comment");
+            throw new ForbiddenException("User is not allowed to modify this comment");
         }
 
         retrievedComment.setIsDeleted(true);
@@ -132,7 +136,7 @@ public class CommentService {
     private boolean isUserAllowedToModify(Long userId) {
         return claims.getClaim("role").equals("ADMIN")
                 || claims.getClaim("role").equals("SUPER_ADMIN")
-                || userId.toString().equals(claims.getClaim("id"));
+                || userId == Long.parseLong(claims.getClaim("id").toString());
     }
 
     private Long getUserId() {

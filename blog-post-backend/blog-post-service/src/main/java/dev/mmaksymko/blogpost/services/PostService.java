@@ -95,7 +95,7 @@ public class PostService {
     private boolean isUserAllowedToModify(Long userId) {
         return claims.getClaim("role").equals("ADMIN")
                 || claims.getClaim("role").equals("SUPER_ADMIN")
-                || userId.toString().equals(claims.getClaim("id"));
+                || userId == Long.parseLong(claims.getClaim("id").toString());
     }
 
     private Long getUserId() {

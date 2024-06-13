@@ -134,8 +134,8 @@ public class UserService {
     }
 
     private boolean isUserAllowedToModify(Long userId) {
-        return claims.getClaim("role").equals(UserRole.ADMIN.name())
-                || claims.getClaim("role").equals(UserRole.SUPER_ADMIN.name())
-                || userId.toString().equals(claims.getClaim("id"));
+        return claims.getClaim("role").equals("ADMIN")
+                || claims.getClaim("role").equals("SUPER_ADMIN")
+                || userId == Long.parseLong(claims.getClaim("id").toString());
     }
 }
