@@ -1,6 +1,7 @@
 package dev.mmaksymko.users.services;
 
 import dev.mmaksymko.users.clients.ImageClient;
+import dev.mmaksymko.users.configs.exceptions.ForbiddenException;
 import dev.mmaksymko.users.configs.security.Claims;
 import dev.mmaksymko.users.dto.UserRequest;
 import dev.mmaksymko.users.dto.UserUpdateRequest;
@@ -11,7 +12,6 @@ import dev.mmaksymko.users.models.UserRole;
 import dev.mmaksymko.users.repositories.UserRepository;
 import dev.mmaksymko.users.services.kafka.UserProducer;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import jakarta.ws.rs.ForbiddenException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.Modifying;

@@ -1,7 +1,6 @@
 package dev.mmaksymko.images.configs.exceptions;
 
 import dev.mmaksymko.images.dto.ErrorResponse;
-import jakarta.ws.rs.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

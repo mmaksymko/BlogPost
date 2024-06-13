@@ -3,7 +3,6 @@ package dev.mmaksymko.comments.configs.exceptions;
 import dev.mmaksymko.comments.dto.ErrorResponse;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.retry.MaxRetriesExceededException;
-import jakarta.ws.rs.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

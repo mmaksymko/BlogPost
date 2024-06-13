@@ -1,5 +1,6 @@
 package dev.mmaksymko.blogpost.services;
 
+import dev.mmaksymko.blogpost.configs.exceptions.ForbiddenException;
 import dev.mmaksymko.blogpost.configs.security.Claims;
 import dev.mmaksymko.blogpost.dto.PostRequest;
 import dev.mmaksymko.blogpost.dto.PostResponse;
@@ -9,7 +10,6 @@ import dev.mmaksymko.blogpost.repositories.PostRepository;
 import dev.mmaksymko.blogpost.services.kafka.PostProducer;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
-import jakarta.ws.rs.ForbiddenException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
