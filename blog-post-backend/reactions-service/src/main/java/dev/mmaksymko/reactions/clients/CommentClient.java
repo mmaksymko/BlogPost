@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "comments-service", configuration = OpenFeignClientConfiguration.class)
 public interface CommentClient {
-    @GetMapping("{id}/base/")
+    @GetMapping("comments/{id}/base/")
     Comment getComment(@PathVariable Long id);
 }
 
