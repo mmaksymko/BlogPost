@@ -50,6 +50,7 @@ const Post: React.FC = () => {
 
     const [commentsPage, setCommentsPage] = useState<Page<CommentResponse>>(emptyPage)
     const [comments, setComments] = useState<SignedComment[]>([]);
+    const [commentBoxKey, setCommentBoxKey] = useState(0);
 
     const { id, role } = useContext(AuthContext);
 
@@ -152,7 +153,7 @@ const Post: React.FC = () => {
     }
 
     const fetchComments = async () => {
-        if (!postId || !post?.title) return;
+        if (!postId) return;
 
         const page = await getComments(postId, commentsPage.pageable.pageNumber, openSnack)
         if (!page) return;
@@ -288,6 +289,9 @@ const Post: React.FC = () => {
         setComments(prevComments => [...signedComments, ...prevComments]);
 
         commentsPage.totalElements++
+
+        setCommentContent('');
+        setCommentBoxKey(prevKey => prevKey + 1); // increment the key
     }
 
     const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => setCommentContent(event.target.value);
@@ -318,6 +322,12 @@ const Post: React.FC = () => {
 
         await deletePost(post.id, openSnack);
         navigateToHome();
+    }
+
+    const handleEdit = () => {
+        if (!post) return;
+
+        navigate('edit');
     }
 
     return (
@@ -356,7 +366,7 @@ const Post: React.FC = () => {
                 </div>
                 {(id == post?.authorId || (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN)) &&
                     <div className="modify-icons">
-                        <Button inverted width='3rem' height='3rem'>
+                        <Button inverted width='3rem' height='3rem' onClick={handleEdit}>
                             <EditIcon />
                         </Button>
                         <Button inverted width='3rem' height='3rem' onClick={handleDelete}>
@@ -371,7 +381,15 @@ const Post: React.FC = () => {
                     Коментарі ({totalComments})
                 </div>
                 <div className='comment-box-container'>
-                    <CommentBox minRows={2} maxRows={6} placeholder='Напишіть коментар...' onChange={handleTextareaChange} onClick={handleCommentAdding} />
+                    <CommentBox
+                        key={`write-comment-${commentBoxKey}`}
+                        minRows={2}
+                        maxRows={6}
+                        placeholder='Напишіть коментар...'
+                        onChange={handleTextareaChange}
+                        onClick={handleCommentAdding}
+                        value={commentContent}
+                    />
                 </div>
                 <div className='comments-container'>
                     {comments.map(comment => <Comment comment={comment} key={comment.commentId} />)}
