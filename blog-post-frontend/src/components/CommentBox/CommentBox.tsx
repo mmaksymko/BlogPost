@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './CommentBox.css';
 
 import SendIcon from '@mui/icons-material/Send';
@@ -10,10 +10,14 @@ interface CommentBoxProps {
     autoFocus?: boolean;
     onClick?: () => void;
     onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onBlur?: () => void;
+    value?: string;
+    fullWidth?: boolean;
 }
 
-const CommentBox: React.FC<CommentBoxProps> = ({ minRows = 1, maxRows = 4, placeholder, onClick, onChange, autoFocus = false }) => {
+const CommentBox: React.FC<CommentBoxProps> = ({ minRows = 1, maxRows = 4, placeholder, onClick, onChange, onBlur, autoFocus = false, value = '', fullWidth = false }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [text, setText] = useState(value);
 
     useEffect(() => {
         const autoResize = () => {
@@ -26,6 +30,10 @@ const CommentBox: React.FC<CommentBoxProps> = ({ minRows = 1, maxRows = 4, place
 
         if (textareaRef.current) {
             textareaRef.current.addEventListener('input', autoResize, false);
+            if (autoFocus) {
+                const length = textareaRef.current.value.length;
+                textareaRef.current.setSelectionRange(length, length);
+            }
         }
 
         return () => {
@@ -35,17 +43,35 @@ const CommentBox: React.FC<CommentBoxProps> = ({ minRows = 1, maxRows = 4, place
         }
     }, [maxRows]);
 
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setText(event.target.value);
+        if (onChange) {
+            onChange(event);
+        }
+    }
+
+    const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (onClick) {
+            onClick();
+        }
+    }
+
+
     return (
-        <section className="commentbox-container">
+        <section className={`${fullWidth ? 'edit-comment ' : ''}commentbox-container`}>
             <textarea
                 ref={textareaRef}
                 className="commentbox-textarea"
                 placeholder={placeholder}
                 rows={minRows}
-                onChange={onChange}
+                onChange={handleChange}
+                onBlur={onBlur}
                 autoFocus={autoFocus}
+                value={text}
             />
-            <div onClick={onClick}>
+            <div onMouseDown={handleClick}>
                 <SendIcon className='send-icon' />
             </div>
         </section>

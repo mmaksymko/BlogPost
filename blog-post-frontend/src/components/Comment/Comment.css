@@ -22,8 +22,6 @@
 .comment-container {
     display: flex;
     gap: 1rem;
-    /* position: relative; */
-    /* width: 100% */
 }
 
 .comment-author-section {
@@ -88,4 +86,8 @@
 .modification-icons {
     display: flex;
     gap: 1rem;
+}
+
+.edited-comment {
+    font-style: italic;
 }

@@ -7,7 +7,6 @@ import './Footer.css';
 import { ReactComponent as FooterSvg } from '../../img/footer.svg';
 
 const Header: React.FC = ({ }) => {
-    var redirect = (url: string) => window.location.href = url;
 
     return (
         <footer className='footer'>
@@ -18,10 +17,10 @@ const Header: React.FC = ({ }) => {
                 <FooterSvg className="footer-svg" />
             </section>
             <section className='footer-right-part'>
-                <Facebook className="social-icon" style={{ fontSize: "2.25rem" }} onClick={() => redirect('https://www.facebook.com/mmaksymko')} />
-                <Telegram className="social-icon" style={{ fontSize: "2.25rem" }} onClick={() => redirect('https://t.me/maksymko')} />
-                <Instagram className="social-icon" style={{ fontSize: "2.25rem" }} onClick={() => redirect('https://instagram.com/mmaksymko')} />
-                <LinkedIn className="social-icon" style={{ fontSize: "2.25rem" }} onClick={() => redirect('https://www.linkedin.com/in/maksym-myna/')} />
+                <Facebook className="social-icon" style={{ fontSize: "2.25rem" }} onClick={() => window.open('https://www.facebook.com/mmaksymko')} />
+                <Telegram className="social-icon" style={{ fontSize: "2.25rem" }} onClick={() => window.open('https://t.me/maksymko')} />
+                <Instagram className="social-icon" style={{ fontSize: "2.25rem" }} onClick={() => window.open('https://instagram.com/mmaksymko')} />
+                <LinkedIn className="social-icon" style={{ fontSize: "2.25rem" }} onClick={() => window.open('https://www.linkedin.com/in/maksym-myna/')} />
             </section>
         </footer>
     );

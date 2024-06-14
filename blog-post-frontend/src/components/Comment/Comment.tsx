@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
 import './Comment.css';
-import { SignedBaseCommentResponse, SignedChildlessCommentResponse, SignedComment, SignedParentlessCommentResponse } from '../../models/Comment';
 
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
@@ -10,11 +9,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import Link from '../Link';
 import CommentBox from '../CommentBox';
-import { addComment, deleteComment } from '../../api-calls/Comment';
+import { addComment, deleteComment, updateComment } from '../../api-calls/Comment';
 import { defaultSnackBar, Severity, SnackBarContext } from '../../contexts/SnackBarContext';
 import { AuthContext } from '../../contexts/AuthContext';
 import { UserRole } from '../../models/User';
 import { addCommentReaction, deleteCommentReaction } from '../../api-calls/CommentReaction';
+import { useNavigate } from 'react-router-dom';
+import { SignedComment } from '../../models/Comment';
 
 interface CommentProps {
     comment: SignedComment;
@@ -29,12 +30,19 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
 
     const MAX_CONTENT_LENGTH = 500;
     const MAX_AUTHOR_NAME_LENGTH = 35;
-
+    const [isEditing, setIsEditing] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
+
+    const [isModified, setIsModified] = useState(comment.isModified);
     const [isFullContentShown, setIsFullContentShown] = useState(false);
     const [commentContent, setCommentContent] = useState('');
+    const [processedCommentContent, setProcessedCommentContent] = useState('');
+    const [editCommentContent, setEditCommentContent] = useState('');
+
+    const navigate = useNavigate();
 
     useEffect(() => {
+        setProcessedCommentContent(getContent(comment.content));
         if (localStorage.getItem('scrollToBottom')) {
             window.scrollTo(0, document.body.scrollHeight);
             localStorage.removeItem('scrollToBottom');
@@ -45,6 +53,8 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
     const openSnack = (severity: Severity, message: string) => {
         setSnackBar({ ...defaultSnackBar, open: true, severity: severity, message: message });
     }
+
+    const pfp = comment.authorPfpUrl ? comment.authorPfpUrl : 'https://github.com/googlefonts/noto-emoji/blob/main/png/512/emoji_u1f438.png?raw=true';
 
     const handleReplyOpening = () => {
         if (!comment.isDeleted) {
@@ -64,9 +74,9 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
         return str;
     };
 
-    const content = !comment.content || isFullContentShown || comment.content.length <= MAX_CONTENT_LENGTH
-        ? comment.content
-        : shortenString(comment.content, MAX_CONTENT_LENGTH, false, true);
+    const getContent = (content: string) => !content ? 'DELETED' : isFullContentShown || content.length <= MAX_CONTENT_LENGTH
+        ? content
+        : shortenString(content, MAX_CONTENT_LENGTH, false, true);
 
 
     const parseReactionsCount = (count: number): string => {
@@ -87,6 +97,8 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
     }
 
     const handleCommentAdding = async () => {
+        if (role === UserRole.UNAUTHORIZED) navigateToLogin();
+
         const commentResponse = await addComment(comment.postId, comment.commentId, commentContent, openSnack)
 
         if (!commentResponse) return;
@@ -96,6 +108,10 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
 
     const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setCommentContent(event.target.value);
+    }
+
+    const handleEditTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setEditCommentContent(event.target.value);
     }
 
     const canModify = () => {
@@ -118,7 +134,6 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
         }
     }
 
-
     const deleteReaction = async () => {
         const result = deleteCommentReaction(comment.commentId, openSnack);
 
@@ -129,7 +144,13 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
         return await result;
     }
 
+    const navigateToLogin = () => {
+        navigate('/login')
+    }
+
     const addReaction = async (reaction: string) => {
+        if (role === UserRole.UNAUTHORIZED) navigateToLogin();
+
         const result = addCommentReaction(comment.commentId, reaction, openSnack);
 
         if (myReaction) removeTheReaction(myReaction)
@@ -149,6 +170,20 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
         }
     }
 
+    const handleCommentEditing = async () => {
+        if (editCommentContent && editCommentContent !== commentContent) {
+            console.log(editCommentContent, commentContent)
+            var result = await updateComment(comment.commentId, editCommentContent, openSnack);
+
+            if (result) {
+                setCommentContent(result.content);
+                setProcessedCommentContent(getContent(result.content));
+                setIsModified(result.isModified);
+            }
+        }
+        setIsEditing(false);
+    }
+
     const handleDelete = async () => {
         if (!comment.isDeleted) {
             await deleteComment(comment.commentId, openSnack);
@@ -156,33 +191,62 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
         }
     }
 
-    const renderCommentSection = (comment: SignedBaseCommentResponse, children: React.ReactNode): React.ReactNode => (
+    const wrapInLinkIfNotNull = (urn: string, condition: any, children: React.ReactNode): React.ReactNode => {
+        return (
+            condition
+                ?
+                <Link to={urn}>
+                    {children}
+                </Link>
+                :
+                children
+        )
+    }
+
+
+    const renderCommentSection = (comment: SignedComment, children: React.ReactNode): React.ReactNode => (
         <>
             <div key={comment.commentId} className='comment'>
                 <div className='comment-container'>
-                    <Link to={`/users/${comment.userId}`}>
-                        <img src={comment.authorPfpUrl} className='pfp' />
-                    </Link>
+                    {
+                        wrapInLinkIfNotNull(`/users/${comment.userId}`, comment.userId, <img src={pfp} className='pfp' />)
+                    }
                     <section className='top-comment-right-section'>
                         <section className='top-comment-section'>
                             <div className='comment-author-section'>
-                                <Link to={`/users/${comment.userId}`}>
-                                    <span className='comment-author'>{shortenString(comment.authorName, MAX_AUTHOR_NAME_LENGTH)}</span>
-                                </Link>
-                                <time className='comment-date' dateTime={comment.commentedAt ? comment.commentedAt.toLocaleString() : ''}>
+                                {
+                                    wrapInLinkIfNotNull(`/users/${comment.userId}`, comment.userId, <span className='comment-author'>{shortenString(comment.authorName, MAX_AUTHOR_NAME_LENGTH)}</span>)
+                                }
+                                < time className='comment-date' dateTime={comment.commentedAt ? comment.commentedAt.toLocaleString() : ''}>
                                     {comment.commentedAt ? comment.commentedAt.toLocaleString() : ''}
-                                </time>                            </div>
+                                </time>
+                                {
+                                    isModified &&
+                                    <span className='edited-comment'>Edited</span>
+                                }
+                            </div>
                         </section>
-                        <div className='comment-content'>
-                            {content}
-                            {comment.content ? comment.content.length > MAX_CONTENT_LENGTH : true && (
-                                <a onClick={() => setIsFullContentShown(!isFullContentShown)}>
-                                    {isFullContentShown
-                                        ? <div className="wrap-text">…<br />Показати менше</div>
-                                        : <div className="wrap-text">…<br />Докладніше</div>}
-                                </a>
-                            )}
-                        </div>
+                        {isEditing ? (
+                            <CommentBox
+                                value={processedCommentContent}
+                                fullWidth
+                                autoFocus
+                                onClick={handleCommentEditing}
+                                onChange={(e) => handleEditTextareaChange(e)}
+                                onBlur={() => setIsEditing(false)}
+                            />
+                        ) : (
+                            <div className='comment-content'>
+                                {processedCommentContent}
+                                {(comment.content ? comment.content.length > MAX_CONTENT_LENGTH : false) && (
+                                    <a onClick={() => setIsFullContentShown(!isFullContentShown)}>
+                                        {isFullContentShown
+                                            ? <div className="wrap-text">…<br />Показати менше</div>
+                                            : <div className="wrap-text">…<br />Докладніше</div>}
+                                    </a>
+                                )}
+                            </div>
+                        )}
                         <div className="comment-controls">
                             <div className="comments-reactions">
                                 <section className='comment-reaction' onClick={() => { if (!comment.isDeleted) handleReaction("LIKE") }}>
@@ -207,7 +271,7 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
                             {canModify() &&
                                 <div className="modification-icons">
                                     <section>
-                                        <EditIcon className='reactions-icon' />
+                                        <EditIcon className='reactions-icon' onClick={() => setIsEditing(true)} />
                                     </section>
                                     <section onClick={handleDelete}>
                                         <DeleteIcon className='reactions-icon' />
@@ -232,11 +296,11 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
         )
     );
 
-    const renderParentComment = (comment: SignedChildlessCommentResponse): React.ReactNode => (
+    const renderParentComment = (comment: SignedComment): React.ReactNode => (
         <Comment comment={comment as SignedComment} />
     );
 
-    const renderChildComment = (comment: SignedParentlessCommentResponse, index: number): React.ReactNode => (
+    const renderChildComment = (comment: SignedComment, index: number): React.ReactNode => (
         <Comment key={index} comment={comment as SignedComment} />
     );
 

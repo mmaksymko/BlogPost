@@ -18,13 +18,12 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import Button from '../../components/Button';
 import Comment from '../../components/Comment';
 import { AuthContext } from '../../contexts/AuthContext';
-import { UserResponse, UserRole } from '../../models/User';
-import { BaseCommentResponse, ChildlessCommentResponse, CommentResponse, ParentlessCommentResponse, SignedBaseCommentResponse, SignedChildlessCommentResponse, SignedComment, SignedParentlessCommentResponse } from '../../models/Comment';
+import { UserRole } from '../../models/User';
 import { Page, emptyPage } from '../../models/Page';
 import { addComment, getComments } from '../../api-calls/Comment';
-import SendIcon from '@mui/icons-material/Send';
 import CommentBox from '../../components/CommentBox';
 import { getCommentReactionCount, getUserReaction } from '../../api-calls/CommentReaction';
+import { CommentResponse, SignedComment } from '../../models/Comment';
 
 interface AuthorData {
     name: string;
@@ -81,11 +80,16 @@ const Post: React.FC = () => {
         return await getCommentReactionCount(commentId, openSnack);
     }
 
-    const mapToSignedBaseComment = async (comment: BaseCommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedBaseCommentResponse> => {
+    const getDate = (date: Date) => date ? new Date(`${date}Z`) : null;
+
+    const mapToSignedBaseComment = async (comment: CommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedComment> => {
         const reactions = await getReactions(comment.commentId);
         const myReaction = await getMyReaction(comment.commentId);
         return {
             ...comment,
+            commentedAt: getDate(comment.commentedAt),
+            parentComment: null,
+            subComments: [],
             authorName: authorsMap[comment.userId].name,
             authorPfpUrl: authorsMap[comment.userId].pfp,
             likes: reactions.LIKE,
@@ -94,15 +98,16 @@ const Post: React.FC = () => {
         };
     };
 
-    const mapToSignedChildlessComment = async (comment: ChildlessCommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedChildlessCommentResponse> => {
+    const mapToSignedChildlessComment = async (comment: CommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedComment> => {
         const baseComment = await mapToSignedBaseComment(comment, authorsMap);
         return {
             ...baseComment,
+            commentedAt: getDate(comment.commentedAt),
             parentComment: comment.parentComment ? await mapToSignedChildlessComment(comment.parentComment, authorsMap) : null
         };
     };
 
-    const mapToSignedParentlessComment = async (comment: ParentlessCommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedParentlessCommentResponse> => {
+    const mapToSignedParentlessComment = async (comment: CommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedComment> => {
         const baseComment = await mapToSignedBaseComment(comment, authorsMap);
         return {
             ...baseComment,
@@ -114,6 +119,7 @@ const Post: React.FC = () => {
         const baseComment = await mapToSignedBaseComment(comment, authorsMap);
         return {
             ...baseComment,
+            commentedAt: getDate(comment.commentedAt),
             parentComment: comment.parentComment ? await mapToSignedChildlessComment(comment.parentComment, authorsMap) : null,
             subComments: await Promise.all(comment.subComments.map(subComment => mapToSignedParentlessComment(subComment, authorsMap)))
         };
@@ -179,7 +185,7 @@ const Post: React.FC = () => {
     }
 
     const handleCommentAdding = async () => {
-        if (!postId) return;
+        if (!postId || !commentContent) return;
 
         const comment = await addComment(parseInt(postId), null, commentContent, openSnack)
 
@@ -204,6 +210,17 @@ const Post: React.FC = () => {
     const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setCommentContent(event.target.value);
     }
+
+    const isSignedComment = (comment: any): comment is SignedComment => {
+        return comment.parentComment !== undefined;
+    }
+
+    const countComments = (comment: SignedComment): number => {
+        return isSignedComment(comment)
+            ? 1 + comment.subComments.reduce((total, subComment) => total + countComments(subComment), 0)
+            : 1
+    }
+    const totalComments = comments.reduce((total, comment) => total + countComments(comment), 0);
 
     return (
         <div className="post">
@@ -235,7 +252,7 @@ const Post: React.FC = () => {
             <Markdown className="post-content" content={post?.content} />
             <div className='post-comments'>
                 <div className='page-header-title font-size-1-5rem'>
-                    Коментарі ({commentsPage.totalElements})
+                    Коментарі ({totalComments})
                 </div>
                 <div className='comment-box-container'>
                     <CommentBox minRows={2} maxRows={6} placeholder='Напишіть коментар...' onChange={handleTextareaChange} onClick={handleCommentAdding} />
