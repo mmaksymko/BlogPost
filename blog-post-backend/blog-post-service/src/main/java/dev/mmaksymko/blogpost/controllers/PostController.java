@@ -15,8 +15,11 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping
-    public Page<PostResponse> getPosts(Pageable pageable) {
-        return postService.getPosts(pageable);
+    public Page<PostResponse> getPosts(
+            Pageable pageable,
+            @RequestParam(required = false) Long authorId
+    ) {
+        return postService.getPosts(pageable, authorId);
     }
 
     @GetMapping("{id}/")

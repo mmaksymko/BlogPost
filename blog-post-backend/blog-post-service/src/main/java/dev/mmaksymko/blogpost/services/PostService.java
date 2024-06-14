@@ -38,6 +38,13 @@ public class PostService {
         return postMapper.toResponse(post);
     }
 
+    public Page<PostResponse> getPosts(Pageable pageable, Long authorId) {
+        if (authorId == null) {
+            return getPosts(pageable);
+        }
+        return postRepository.findAllByAuthorId(authorId, pageable).map(postMapper::toResponse);
+    }
+
     @Transactional
     @Modifying
     @RateLimiter(name = "rate-limit-post")
