@@ -12,3 +12,5 @@ export const getUser = async (id: number, onSuccess: (response: any) => any, onE
         .then(onSuccess)
         .catch(onError);
 }
+
+export const logout = async () => axios.post(`${serverURL}/logout`, {}, { withCredentials: true });
