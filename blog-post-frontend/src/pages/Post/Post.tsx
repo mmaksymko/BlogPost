@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import './Post.css';
 
-import { redirect, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { ReactedSignedPost } from '../../models/Post';
 import Markdown from '../../components/Markdown';
@@ -15,15 +15,18 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
+import { AuthContext } from '../../contexts/AuthContext';
+
 import Button from '../../components/Button';
 import Comment from '../../components/Comment';
-import { AuthContext } from '../../contexts/AuthContext';
+import CommentBox from '../../components/CommentBox';
+
 import { UserRole } from '../../models/User';
 import { Page, emptyPage } from '../../models/Page';
-import { addComment, getComments } from '../../api-calls/Comment';
-import CommentBox from '../../components/CommentBox';
-import { getCommentReactionCount, getUserCommentReaction } from '../../api-calls/CommentReaction';
 import { CommentResponse, SignedComment } from '../../models/Comment';
+
+import { addComment, getComments } from '../../api-calls/Comment';
+import { getCommentReactionCount, getUserCommentReaction } from '../../api-calls/CommentReaction';
 import { addPostReaction, deletePostReaction, getPostReactionCount, getUserPostReaction } from '../../api-calls/PostReaction';
 
 interface AuthorData {
@@ -39,7 +42,7 @@ const Post: React.FC = () => {
     const { id: postId } = useParams<{ id: string }>();
     const [post, setPost] = useState<ReactedSignedPost | null>(null);
     const [commentContent, setCommentContent] = useState('');
-    const [last, setLast] = useState(false);
+    const [last, setLast] = useState(true);
 
     const [likes, setLikes] = useState(0);
     const [dislikes, setDislikes] = useState(0);
@@ -61,9 +64,10 @@ const Post: React.FC = () => {
     }, []);
 
     const navigate = useNavigate();
-    const navigateToLogin = () => {
-        navigate('/login')
-    }
+
+    const navigateToLogin = () => navigate('/login')
+    const navigateToHome = () => navigate('/')
+    const navigateToNoPage = () => navigate('/no-page')
 
     const fetchAuthorNameAndPfp = (authorId: number): Promise<AuthorInfo> => {
         const onSuccess = (response: any): AuthorInfo => ({
@@ -80,23 +84,11 @@ const Post: React.FC = () => {
         return getUser(authorId, onSuccess, onError);
     }
 
-    const getMyCommentReaction = async (commentId: number) => {
-        const reaction = (await getUserCommentReaction(commentId, openSnack)).reaction
-        return reaction?.name
-    }
+    const getMyCommentReaction = async (commentId: number) => (await getUserCommentReaction(commentId, openSnack)).reaction?.name
+    const getCommentReactions = async (commentId: number) => await getCommentReactionCount(commentId, openSnack);
 
-    const getCommentReactions = async (commentId: number) => {
-        return await getCommentReactionCount(commentId, openSnack);
-    }
-
-    const getMyPostReaction = async (commentId: number) => {
-        const reaction = (await getUserPostReaction(commentId, openSnack)).reaction
-        return reaction?.name
-    }
-
-    const getPostReactions = async (commentId: number) => {
-        return await getPostReactionCount(commentId, openSnack);
-    }
+    const getMyPostReaction = async (commentId: number) => (await getUserPostReaction(commentId, openSnack)).reaction?.name
+    const getPostReactions = async (commentId: number) => await getPostReactionCount(commentId, openSnack);
 
     const getDate = (date: Date) => date ? new Date(`${date}Z`) : null;
 
@@ -187,10 +179,16 @@ const Post: React.FC = () => {
     }
 
     const fetchPost = async () => {
-        if (!postId) return;
+        if (!postId) {
+            navigateToNoPage()
+            return;
+        }
 
-        const post = await getPost(postId, openSnack)
-        if (!post) return;
+        const post = await getPost(postId)
+        if (!post) {
+            navigateToNoPage()
+            return;
+        }
 
         const onSuccess = (response: any) => response.data.firstName + " " + response.data.lastName
         const onError = (error: any) => setSnackBar({ ...defaultSnackBar, open: true, severity: "error", message: `Failed to fetch author name! ${error.response.data.error}` });
@@ -268,7 +266,10 @@ const Post: React.FC = () => {
 
     const handleCommentAdding = async () => {
         if (!postId || !commentContent) return;
-
+        if (role === UserRole.UNAUTHORIZED) {
+            navigateToLogin();
+            return;
+        }
         const comment = await addComment(parseInt(postId), null, commentContent, openSnack)
 
         if (!comment) return;
@@ -289,13 +290,9 @@ const Post: React.FC = () => {
         commentsPage.totalElements++
     }
 
-    const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setCommentContent(event.target.value);
-    }
+    const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => setCommentContent(event.target.value);
 
-    const isSignedComment = (comment: any): comment is SignedComment => {
-        return comment.parentComment !== undefined;
-    }
+    const isSignedComment = (comment: any): comment is SignedComment => comment.parentComment !== undefined;
 
     const countComments = (comment: SignedComment): number => {
         return isSignedComment(comment)
@@ -320,7 +317,7 @@ const Post: React.FC = () => {
         if (!post) return;
 
         await deletePost(post.id, openSnack);
-        navigate('/');
+        navigateToHome();
     }
 
     return (

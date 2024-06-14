@@ -37,7 +37,7 @@ const EditPost: React.FC = () => {
     const fetchPost = async () => {
         if (!postId) return;
 
-        const fetchedPost = await getPost(postId, openSnack)
+        const fetchedPost = await getPost(postId)
 
         if (!fetchedPost || !canModify(fetchedPost.authorId)) {
             navigate('/');

@@ -11,11 +11,11 @@ export const getPosts = async (page: number, openSnack: (severity: Severity, mes
         .catch((error: any) => openSnack('error', `Помилка отримання ${error.response?.data.error}`));
 }
 
-export const getPost = async (id: string | number, openSnack: (severity: Severity, message: string) => void): Promise<PostResponse> => {
+export const getPost = async (id: string | number): Promise<PostResponse> => {
     return axios
         .get(`${serverURL}/blog-post-service/posts/${id}/`, { withCredentials: true })
         .then(response => response.data)
-        .catch((error: any) => openSnack('error', `Помилка отримання ${error.response?.data.error}`));
+        .catch(() => null);
 }
 
 export const addPost = async (title: string, content: string, headerImageURL: string, openSnack: (severity: Severity, message: string) => void): Promise<PostResponse | void> => {
