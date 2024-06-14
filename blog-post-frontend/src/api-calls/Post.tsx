@@ -4,9 +4,16 @@ import { Severity } from '../contexts/SnackBarContext';
 import { PostRequest, PostResponse } from '../models/Post';
 import { Page } from '../models/Page';
 
-export const getPosts = async (page: number, openSnack: (severity: Severity, message: string) => void): Promise<Page<PostResponse>> => {
+export const getPosts = async (
+    page: number,
+    openSnack: (severity: Severity, message: string) => void,
+    authorId?: number
+): Promise<Page<PostResponse>> => {
+    let url = `${serverURL}/blog-post-service/posts/?size=10&page=${page}`;
+    if (authorId) url += `&authorId=${authorId}`;
+    console.log(url);
     return axios
-        .get(`${serverURL}/blog-post-service/posts/?size=10&page=${page}`, { withCredentials: true })
+        .get(url, { withCredentials: true })
         .then(response => response.data)
         .catch((error: any) => openSnack('error', `Помилка отримання ${error.response?.data.error}`));
 }
