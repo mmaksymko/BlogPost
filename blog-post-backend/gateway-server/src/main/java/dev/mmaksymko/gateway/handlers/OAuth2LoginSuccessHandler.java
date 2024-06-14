@@ -75,7 +75,7 @@ public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHan
 
     public User getUserFromAttributes(Map<String, Object> attributes){
         Object pfpUrlObj = attributes.getOrDefault("picture", null);
-        String pfpUrl = pfpUrlObj == null ? null : pfpUrlObj.toString().replace("s96-c", "s512-c");
+        String pfpUrl = pfpUrlObj == null ? null : pfpUrlObj.toString().replaceAll("=s96-c$", "");
         return User
                 .builder()
                 .email(attributes.get("email").toString())
