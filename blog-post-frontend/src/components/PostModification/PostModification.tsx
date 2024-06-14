@@ -27,6 +27,7 @@ const PostModification: React.FC<PostModificationProps> = ({ isEdit = false, ima
     const [content, setContent] = useState('');
     const [headerImage, setHeaderImage] = useState<File | null>(null);
     const [headerImageUrl, setHeaderImageUrl] = useState<string | null>(null);
+    const [imageSrc, setImageSrc] = useState(imageUrl);
 
     const [showPreview, setShowPreview] = useState<boolean | null>(null);
     const [outlined, setOutlined] = useState(true);
@@ -92,14 +93,14 @@ const PostModification: React.FC<PostModificationProps> = ({ isEdit = false, ima
         if (e.target.files && e.target.files.length > 0) {
             setHeaderImage(e.target.files[0]);
             setHeaderImageUrl(URL.createObjectURL(e.target.files[0]));
-            imageUrl = undefined
+            setImageSrc(undefined);
         }
     }
 
     const createPost = async () => {
         if (!headerImage) return
 
-        const imageURL = imageUrl ? imageUrl : await addImage(headerImage, openSnack);
+        const imageURL = imageSrc ? imageSrc : await addImage(headerImage, openSnack);
         if (!imageURL) return;
 
         const response = await addPost(title, content, imageURL, openSnack);
@@ -110,7 +111,7 @@ const PostModification: React.FC<PostModificationProps> = ({ isEdit = false, ima
     const editPost = async () => {
         if (!id) return
 
-        let imageURL: string | void | undefined = imageUrl
+        let imageURL: string | void | undefined = imageSrc
         if (!imageURL) {
             if (!headerImage) return
 
@@ -152,10 +153,10 @@ const PostModification: React.FC<PostModificationProps> = ({ isEdit = false, ima
                 <Button inverted onClick={() => fileInputRef.current?.click()}>
                     Обрати зображення
                 </Button>
-                {(imageUrl || headerImageUrl) &&
+                {(imageSrc || headerImageUrl) &&
                     <img
                         className='post-header-image-preview'
-                        src={imageUrl || headerImageUrl || ''}
+                        src={imageSrc || headerImageUrl || ''}
                         alt="Header preview"
                     />
                 }
@@ -203,7 +204,7 @@ const PostModification: React.FC<PostModificationProps> = ({ isEdit = false, ima
             </div >
             <div className='create-post-button'>
                 <Button inverted onClick={handleModification}>
-                    Створити
+                    {isEdit ? 'Зберегти' : 'Створити'}
                 </Button>
             </div>
         </div>
