@@ -11,6 +11,7 @@ import { AuthContext, unauthorizedUser } from '../../contexts/AuthContext';
 import Link from '../Link';
 import Button from '../Button';
 import { getCurrentUser } from '../../api-calls/User';
+import { defaultPfp } from '../../config';
 
 const Header: React.FC = () => {
     const location = useLocation()
@@ -51,7 +52,7 @@ const Header: React.FC = () => {
                                 !pfpUrl ?
                                     <FaceIcon style={{ width: "2rem", height: "2rem" }} />
                                     :
-                                    <img className="pfp" src={pfpUrl} alt="Profile" />
+                                    <img className="pfp" src={pfpUrl ? pfpUrl : defaultPfp} alt="Profile" />
                             }
                             <Link to="/profile" className="profile-text">Профіль</Link>
                         </div>

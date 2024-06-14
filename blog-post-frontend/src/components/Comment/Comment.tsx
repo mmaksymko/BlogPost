@@ -16,6 +16,7 @@ import { UserRole } from '../../models/User';
 import { addCommentReaction, deleteCommentReaction } from '../../api-calls/CommentReaction';
 import { useNavigate } from 'react-router-dom';
 import { SignedComment } from '../../models/Comment';
+import { defaultPfp } from '../../config';
 
 interface CommentProps {
     comment: SignedComment;
@@ -54,7 +55,7 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
         setSnackBar({ ...defaultSnackBar, open: true, severity: severity, message: message });
     }
 
-    const pfp = comment.authorPfpUrl ? comment.authorPfpUrl : 'https://github.com/googlefonts/noto-emoji/blob/main/png/512/emoji_u1f438.png?raw=true';
+    const pfp = comment.authorPfpUrl ? comment.authorPfpUrl : defaultPfp;
 
     const handleReplyOpening = () => {
         if (!comment.isDeleted) {
