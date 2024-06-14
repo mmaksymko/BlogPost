@@ -32,5 +32,9 @@ The example is for **Gmail**, but you can use your prefered e-mail provider.
 	- `MINIO_ACCESS_KEY`
 	- `MINIO_SECRET_KEY`
 	- `JWT_SECRET_KEY`
-6. Run `docker-compose -f blog-post-backend/docker/docker-compose.yml up` in the terminal to start the backend
-7. In separate terminal start the frontend by running `npm start --prefix blog-post-frontend` in the terminal
+6. To start the application run in console the nxt command:
+```
+	docker network create blogpost-network ; 
+	docker-compose -f blog-post-backend/docker/docker-compose.yml up --build -d ;
+	docker-compose -f blog-post-frontend/docker/docker-compose.yml up --build -d
+```

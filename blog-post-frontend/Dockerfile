@@ -17,3 +17,11 @@ COPY . .
 
 # Run the build command to generate production-ready artifacts
 RUN npm run build
+
+# Use Nginx for serving the built application
+FROM nginx:1.21.1-alpine
+
+# Copy the build output to replace the default Nginx contents.
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
+
+EXPOSE 80

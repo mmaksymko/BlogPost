@@ -12,7 +12,7 @@ services:
       - ./docker/init.sql:/docker-entrypoint-initdb.d/1-init.sql
       - db-data:/var/lib/postgresql/data
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "database"
           - "postgres"
@@ -32,7 +32,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       ENCRYPT_ENABLED: ${ENCRYPT_ENABLED:-false}
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "config-server"
     healthcheck:
@@ -55,7 +55,7 @@ services:
       config-server:
         condition: service_healthy
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "discovery-server"
   gateway-server:
@@ -81,7 +81,7 @@ services:
     ports:
       - "8080:8080"
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "gateway-server"
   blog-post-service:
@@ -104,7 +104,7 @@ services:
     ports:
       - "8081:8081"
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "blog-post-service"
   comments-service:
@@ -130,7 +130,7 @@ services:
     ports:
       - "8082:8082"
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "comments-service"
   reactions-service:
@@ -156,7 +156,7 @@ services:
     ports:
       - "8083:8083"
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "reactions-service"
   users-service:
@@ -179,7 +179,7 @@ services:
     ports:
       - "8085:8085"
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "users-service"
   email-service:
@@ -201,7 +201,7 @@ services:
     ports:
       - "8086:8086"
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "email-service"
   images-service:
@@ -223,7 +223,7 @@ services:
     ports:
       - "8084:8084"
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - "images-service"
   kafka:
@@ -239,7 +239,7 @@ services:
       - "9092:9092"
       - "9093:9093"
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - kafka
   redis:
@@ -254,7 +254,7 @@ services:
       - REDIS_PORT=6379
       - REDIS_DATABASES=16
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - redis
     healthcheck:
@@ -279,11 +279,11 @@ services:
       timeout: 20s
       retries: 3
     networks:
-      backend:
+      blogpost-network:
         aliases:
           - minio
 networks:
-  backend:
+  blogpost-network:
     driver: bridge
 
 volumes:
