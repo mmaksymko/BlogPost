@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import './Post.css';
 
-import { useParams } from "react-router-dom";
+import { redirect, useNavigate, useParams } from "react-router-dom";
 
-import { SignedPost } from '../../models/Post';
+import { ReactedSignedPost } from '../../models/Post';
 import Markdown from '../../components/Markdown';
 import { defaultSnackBar, Severity, SnackBarContext } from '../../contexts/SnackBarContext';
-import { getPost } from '../../api-calls/Post';
+import { deletePost, getPost } from '../../api-calls/Post';
 import { getUser } from '../../api-calls/User';
 import PostComponent from '../../components/Post';
 
@@ -22,8 +22,9 @@ import { UserRole } from '../../models/User';
 import { Page, emptyPage } from '../../models/Page';
 import { addComment, getComments } from '../../api-calls/Comment';
 import CommentBox from '../../components/CommentBox';
-import { getCommentReactionCount, getUserReaction } from '../../api-calls/CommentReaction';
+import { getCommentReactionCount, getUserCommentReaction } from '../../api-calls/CommentReaction';
 import { CommentResponse, SignedComment } from '../../models/Comment';
+import { addPostReaction, deletePostReaction, getPostReactionCount, getUserPostReaction } from '../../api-calls/PostReaction';
 
 interface AuthorData {
     name: string;
@@ -36,10 +37,13 @@ interface AuthorInfo extends AuthorData {
 
 const Post: React.FC = () => {
     const { id: postId } = useParams<{ id: string }>();
-    const [post, setPost] = useState<SignedPost | null>(null);
+    const [post, setPost] = useState<ReactedSignedPost | null>(null);
     const [commentContent, setCommentContent] = useState('');
     const [last, setLast] = useState(false);
 
+    const [likes, setLikes] = useState(0);
+    const [dislikes, setDislikes] = useState(0);
+    const [myReaction, setMyReaction] = useState<string | null>(null);
 
     const [commentsPage, setCommentsPage] = useState<Page<CommentResponse>>(emptyPage)
     const [comments, setComments] = useState<SignedComment[]>([]);
@@ -56,6 +60,11 @@ const Post: React.FC = () => {
         fetchComments();
     }, []);
 
+    const navigate = useNavigate();
+    const navigateToLogin = () => {
+        navigate('/login')
+    }
+
     const fetchAuthorNameAndPfp = (authorId: number): Promise<AuthorInfo> => {
         const onSuccess = (response: any): AuthorInfo => ({
             id: authorId,
@@ -71,20 +80,29 @@ const Post: React.FC = () => {
         return getUser(authorId, onSuccess, onError);
     }
 
-    const getMyReaction = async (commentId: number) => {
-        const reaction = (await getUserReaction(commentId, openSnack)).reaction
+    const getMyCommentReaction = async (commentId: number) => {
+        const reaction = (await getUserCommentReaction(commentId, openSnack)).reaction
         return reaction?.name
     }
 
-    const getReactions = async (commentId: number) => {
+    const getCommentReactions = async (commentId: number) => {
         return await getCommentReactionCount(commentId, openSnack);
+    }
+
+    const getMyPostReaction = async (commentId: number) => {
+        const reaction = (await getUserPostReaction(commentId, openSnack)).reaction
+        return reaction?.name
+    }
+
+    const getPostReactions = async (commentId: number) => {
+        return await getPostReactionCount(commentId, openSnack);
     }
 
     const getDate = (date: Date) => date ? new Date(`${date}Z`) : null;
 
     const mapToSignedBaseComment = async (comment: CommentResponse, authorsMap: Record<number, AuthorData>): Promise<SignedComment> => {
-        const reactions = await getReactions(comment.commentId);
-        const myReaction = await getMyReaction(comment.commentId);
+        const reactions = await getCommentReactions(comment.commentId);
+        const myReaction = await getMyCommentReaction(comment.commentId);
         return {
             ...comment,
             commentedAt: getDate(comment.commentedAt),
@@ -142,7 +160,7 @@ const Post: React.FC = () => {
     }
 
     const fetchComments = async () => {
-        if (!postId) return;
+        if (!postId || !post?.title) return;
 
         const page = await getComments(postId, commentsPage.pageable.pageNumber, openSnack)
         if (!page) return;
@@ -177,11 +195,75 @@ const Post: React.FC = () => {
         const onSuccess = (response: any) => response.data.firstName + " " + response.data.lastName
         const onError = (error: any) => setSnackBar({ ...defaultSnackBar, open: true, severity: "error", message: `Failed to fetch author name! ${error.response.data.error}` });
         const authorName: string = await getUser(post.authorId, onSuccess, onError);
+        const reactions = await getPostReactions(post.id);
+        const myReaction = await getMyPostReaction(post.id);
+
+        setLikes(reactions.LIKE);
+        setDislikes(reactions.DISLIKE);
+        setMyReaction(myReaction);
 
         setPost({
             ...post,
-            authorName
+            postedAt: post.postedAt,
+            likes: reactions.LIKE,
+            dislikes: reactions.DISLIKE,
+            myReaction: myReaction,
+            authorName: authorName
         });
+    }
+
+    const removeTheReaction = (reaction: string) => {
+        if (reaction === "LIKE") {
+            setLikes(likes - 1);
+        } else if (reaction === "DISLIKE") {
+            setDislikes(dislikes - 1);
+        }
+    }
+
+    const addTheReaction = (reaction: string) => {
+        if (reaction === "LIKE") {
+            setLikes(likes + 1);
+        } else if (reaction === "DISLIKE") {
+            setDislikes(dislikes + 1);
+        }
+    }
+
+
+    const addReaction = async (reaction: string) => {
+        if (role === UserRole.UNAUTHORIZED || !post?.id) {
+            navigateToLogin();
+            return
+        }
+
+        const result = addPostReaction(post.id, reaction, openSnack);
+
+        if (myReaction) removeTheReaction(myReaction)
+        addTheReaction(reaction);
+
+        setMyReaction(reaction)
+
+        return await result;
+    }
+
+    const deleteReaction = async () => {
+        if (!post) return;
+
+        const result = deletePostReaction(post.id, openSnack);
+
+        if (myReaction) removeTheReaction(myReaction)
+
+        setMyReaction(null);
+
+        return await result;
+    }
+
+    const handleReaction = async (reaction: string) => {
+        if (myReaction === reaction) {
+            await deleteReaction();
+        }
+        if (myReaction !== reaction) {
+            return addReaction(reaction);
+        }
     }
 
     const handleCommentAdding = async () => {
@@ -222,6 +304,25 @@ const Post: React.FC = () => {
     }
     const totalComments = comments.reduce((total, comment) => total + countComments(comment), 0);
 
+    const parseReactionsCount = (count: number): string => {
+        const units = [
+            { value: 1_000_000_000, symbol: 'B' },
+            { value: 1_000_000, symbol: 'M' },
+            { value: 1_000, symbol: 'K' },
+        ];
+
+        const { value, symbol } = units.find(unit => count >= unit.value) || { value: 1, symbol: '' };
+        const result = (count / value).toFixed(1);
+        return parseFloat(result) + symbol;
+    };
+
+    const handleDelete = async () => {
+        if (!post) return;
+
+        await deletePost(post.id, openSnack);
+        navigate('/');
+    }
+
     return (
         <div className="post">
             {post &&
@@ -231,19 +332,37 @@ const Post: React.FC = () => {
             }
             <section className="post-under-header-section">
                 <div className="reaction-icons">
-                    <Button inverted width='3rem' height='3rem'>
-                        <ThumbUpIcon />
-                    </Button>
-                    <Button inverted width='3rem' height='3rem'>
-                        <ThumbDownIcon />
-                    </Button>
+                    <div className='post-reaction'>
+                        <Button
+                            inverted={myReaction !== "LIKE"}
+                            outlined={myReaction === "LIKE"}
+                            width='3rem'
+                            height='3rem'
+                            onClick={() => handleReaction("LIKE")}
+                        >
+                            <ThumbUpIcon />
+                        </Button>
+                        <span className='post-reaction-count'>{parseReactionsCount(likes)}</span>
+                    </div>
+                    <div className='post-reaction'>
+                        <Button
+                            inverted={myReaction !== "DISLIKE"}
+                            outlined={myReaction === "DISLIKE"}
+                            width='3rem'
+                            height='3rem'
+                            onClick={() => handleReaction("DISLIKE")}
+                        >
+                            <ThumbDownIcon />
+                        </Button>
+                        <span className='post-reaction-count'>{parseReactionsCount(dislikes)}</span>
+                    </div>
                 </div>
                 {(id == post?.authorId || (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN)) &&
                     <div className="modify-icons">
                         <Button inverted width='3rem' height='3rem'>
                             <EditIcon />
                         </Button>
-                        <Button inverted width='3rem' height='3rem'>
+                        <Button inverted width='3rem' height='3rem' onClick={handleDelete}>
                             <DeleteIcon />
                         </Button>
                     </div>

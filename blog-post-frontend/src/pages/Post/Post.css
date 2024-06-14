@@ -53,3 +53,13 @@
 .comments-container {
     padding-right: 1.25rem;
 }
+
+.post-reaction {
+    display: flex;
+}
+
+.post-reaction-count {
+    font-size: 1.5rem;
+    margin-left: 0.5rem;
+    align-self: center;
+}

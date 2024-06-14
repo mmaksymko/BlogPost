@@ -9,10 +9,16 @@ export interface PostResponse {
     title: string,
     content: string,
     authorId: number,
-    postedAt: Date,
+    postedAt: Date | null,
     headerImageURL: string
 }
 
 export interface SignedPost extends PostResponse {
     authorName: string
+}
+
+export interface ReactedSignedPost extends SignedPost {
+    likes: number,
+    dislikes: number,
+    myReaction: string | null
 }

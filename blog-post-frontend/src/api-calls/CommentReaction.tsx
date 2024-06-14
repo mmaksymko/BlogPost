@@ -3,7 +3,7 @@ import axios from "axios";
 import { Severity } from "../contexts/SnackBarContext";
 import { CommentReactionRequest, CommentReactionResponse } from "../models/Reaction/CommentReaction";
 
-export const getUserReaction = async (id: string | number, openSnack: (severity: Severity, message: string) => void): Promise<CommentReactionResponse> => {
+export const getUserCommentReaction = async (id: string | number, openSnack: (severity: Severity, message: string) => void): Promise<CommentReactionResponse> => {
     return axios
         .get(`${serverURL}/reactions-service/reactions/comments/${id}/my-reaction/`, { withCredentials: true })
         .then(response => response.data)

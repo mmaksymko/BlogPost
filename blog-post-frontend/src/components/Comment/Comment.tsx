@@ -97,7 +97,10 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
     }
 
     const handleCommentAdding = async () => {
-        if (role === UserRole.UNAUTHORIZED) navigateToLogin();
+        if (role === UserRole.UNAUTHORIZED) {
+            navigateToLogin();
+            return
+        }
 
         const commentResponse = await addComment(comment.postId, comment.commentId, commentContent, openSnack)
 
@@ -149,7 +152,10 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
     }
 
     const addReaction = async (reaction: string) => {
-        if (role === UserRole.UNAUTHORIZED) navigateToLogin();
+        if (role === UserRole.UNAUTHORIZED) {
+            navigateToLogin();
+            return
+        }
 
         const result = addCommentReaction(comment.commentId, reaction, openSnack);
 
