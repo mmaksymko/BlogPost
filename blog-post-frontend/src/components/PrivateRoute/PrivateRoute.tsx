@@ -14,7 +14,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ requiredRole, element }) =>
     const [isAuthorized, setIsAuthorized] = React.useState(false);
     const navigate = useNavigate();
 
-    var checkRole = (role: UserRole) => {
+    var isUserAuthorized = (role: UserRole) => {
         if (requiredRole === UserRole.UNAUTHORIZED) {
             return true;
         }
@@ -39,29 +39,27 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ requiredRole, element }) =>
     }
 
     useEffect(() => {
-        const checkAuth = async () => {
-            const onSuccess = (response: any) => response.data;
-            const onError = (error: any) => {
-                if (error.response && error.response.data.error === 'No value present') {
-                    setUser(unauthorizedUser);
-                } else {
-                    console.error('Failed to check auth:', error);
-                }
-            }
-            const response = await getCurrentUser(onSuccess, onError);
-
-            setUser({ ...response });
-            const role: UserRole = response.role
-            const authorized = checkRole(role)
-            if (!authorized) {
-                navigate('/login')
-            }
-            setIsAuthorized(authorized);
-        };
-
         checkAuth();
-
     }, []);
+
+    const checkAuth = async () => {
+        const onSuccess = (response: any) => response.data;
+        const onError = (error: any) => setUser(unauthorizedUser)
+        const response = await getCurrentUser(onSuccess, onError);
+        if (!response) {
+            navigate('/login')
+            return
+        }
+
+        setUser({ ...response });
+        const role: UserRole = response.role
+
+        if (!role || !isUserAuthorized(role)) {
+            navigate('/login')
+            return
+        }
+        setIsAuthorized(true);
+    };
 
     return isAuthorized ? element : null;
 };

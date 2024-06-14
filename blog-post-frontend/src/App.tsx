@@ -18,6 +18,9 @@ import { AuthContext, unauthorizedUser, UserState } from './contexts/AuthContext
 import PrivateRoute from './components/PrivateRoute';
 import { UserRole } from './models/User';
 import OAauthRedirectHandler from './pages/OAauthRedirectHandler';
+import EditPost from './pages/EditPost';
+import Profile from './pages/Profile';
+import Login from './pages/Login';
 
 function App() {
   const [user, setUser] = useState<UserState>(unauthorizedUser);
@@ -40,8 +43,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/posts/:id" element={<Post />} />
+            <Route path="/posts/:id/edit" element={<PrivateRoute requiredRole={UserRole.USER} element={<EditPost />} />} />
             <Route path="/create-post" element={<PrivateRoute requiredRole={UserRole.USER} element={<CreatePost />} />} />
-            <Route path="oauth2/redirect" element={<OAauthRedirectHandler />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/profile/:userId?" element={<PrivateRoute requiredRole={UserRole.USER} element={<Profile />} />} />
+            <Route path="/oauth2/redirect" element={<OAauthRedirectHandler />} />
             <Route path="*" element={<NoPage />} />
           </Routes>
           <Footer />
