@@ -24,6 +24,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
@@ -134,12 +136,16 @@ public class CommentService {
     }
 
     private boolean isUserAllowedToModify(Long userId) {
-        return claims.getClaim("role").equals("ADMIN")
-                || claims.getClaim("role").equals("SUPER_ADMIN")
-                || userId == Long.parseLong(claims.getClaim("id").toString());
+        return Optional.ofNullable(claims.getClaim("role"))
+                .map(Object::toString)
+                .map(role -> role.equals("ADMIN") || role.equals("SUPER_ADMIN") || userId.equals(getUserId()))
+                .orElse(false);
     }
 
     private Long getUserId() {
-        return Long.parseLong(claims.getClaim("id").toString());
+        return Optional.ofNullable(claims.getClaim("id"))
+                .map(Object::toString)
+                .map(Long::parseLong)
+                .orElse(null);
     }
 }

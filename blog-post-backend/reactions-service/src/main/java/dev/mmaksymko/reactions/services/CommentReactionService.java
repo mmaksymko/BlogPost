@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -136,13 +137,10 @@ public class CommentReactionService {
         return comment;
     }
 
-    private boolean isUserAllowedToModify(Long userId) {
-        return claims.getClaim("role").equals("ADMIN")
-                || claims.getClaim("role").equals("SUPER_ADMIN")
-                || userId == Long.parseLong(claims.getClaim("id").toString());
-    }
-
     private Long getUserId() {
-        return Long.valueOf(claims.getClaim("id").toString());
+        return Optional.ofNullable(claims.getClaim("id"))
+                .map(Object::toString)
+                .map(Long::parseLong)
+                .orElse(null);
     }
 }

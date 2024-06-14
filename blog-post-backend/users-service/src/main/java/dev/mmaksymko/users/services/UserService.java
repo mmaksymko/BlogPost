@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -134,8 +135,16 @@ public class UserService {
     }
 
     private boolean isUserAllowedToModify(Long userId) {
-        return claims.getClaim("role").equals("ADMIN")
-                || claims.getClaim("role").equals("SUPER_ADMIN")
-                || userId == Long.parseLong(claims.getClaim("id").toString());
+        return Optional.ofNullable(claims.getClaim("role"))
+                .map(Object::toString)
+                .map(role -> role.equals("ADMIN") || role.equals("SUPER_ADMIN") || userId.equals(getUserId()))
+                .orElse(false);
+    }
+
+    private Long getUserId() {
+        return Optional.ofNullable(claims.getClaim("id"))
+                .map(Object::toString)
+                .map(Long::parseLong)
+                .orElse(null);
     }
 }
