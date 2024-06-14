@@ -54,7 +54,16 @@ const CommentBox: React.FC<CommentBoxProps> = ({ minRows = 1, maxRows = 4, place
         event.preventDefault();
         event.stopPropagation();
         if (onClick) {
-            onClick();
+            onClick()
+        }
+    }
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            if (onClick) {
+                onClick();
+            }
         }
     }
 
@@ -68,6 +77,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ minRows = 1, maxRows = 4, place
                 rows={minRows}
                 onChange={handleChange}
                 onBlur={onBlur}
+                onKeyDown={handleKeyDown}
                 autoFocus={autoFocus}
                 value={text}
             />
