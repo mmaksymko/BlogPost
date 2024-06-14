@@ -5,6 +5,8 @@ import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
+import remarkEmoji from 'remark-emoji';
+import remarkGfm from 'remark-gfm';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github-dark.css';
 import './Markdown.css';
@@ -28,7 +30,7 @@ const Markdown: React.FC<MarkdownProps> = ({ className, content }) => {
     return (
         <ReactMarkdown
             className={`${className ? className + ' ' : ''}markdown`}
-            remarkPlugins={[remarkMath]}
+            remarkPlugins={[remarkMath, remarkEmoji, remarkGfm]}
             rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema], [rehypeKatex, { strict: false }], rehypeHighlight]}
         >
             {content}
