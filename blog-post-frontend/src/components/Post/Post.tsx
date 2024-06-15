@@ -17,7 +17,7 @@ const Post: React.FC<PostProps> = ({ post, clickable = true }) => {
                 <span className="blog-post-title">{post.title}</span>
             </div>
             <div className="blog-post-description">
-                <Link to={`users/${post.authorId}`}>
+                <Link to={`/profile/${post.authorId}`}>
                     <span className="blog-post-author">{post.authorName}</span>
                 </Link>
                 <span className="blog-post-date">{post.postedAt?.toLocaleString()}</span>
