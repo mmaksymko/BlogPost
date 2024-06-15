@@ -26,22 +26,15 @@ public class UserService {
 
     public Mono<UserResponse> getCurrentUser() {
         Long id = currentUser.getId();
-        UserRole role = currentUser.getRole();
 
-        Mono<String> firstName = getParameter("given_name");
-        Mono<String> lastName = getParameter("family_name");
-        Mono<String> email = getParameter("email");
-        Mono<String> pfpUrl = getParameter("picture");
-
-        return Mono.zip(firstName, lastName, email, pfpUrl)
-                .map(tuple -> UserResponse.builder()
-                        .id(id)
-                        .role(role)
-                        .firstName(tuple.getT1())
-                        .lastName(tuple.getT2())
-                        .email(tuple.getT3())
-                        .pfpUrl(tuple.getT4())
-                        .build());
+        return getUser(id).map(user -> UserResponse.builder()
+                .id(user.getId())
+                .role(user.getRole())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .pfpUrl(user.getPfpUrl())
+                .build());
     }
 
     public Mono<User> getUser(Long userId) {
@@ -56,9 +49,7 @@ public class UserService {
     }
 
     public Mono<User> createUser(User user) {
-        return userClient
-                .createUser(user)
-                .flatMap(userRepository::save)
+        return saveUser(user)
                 .flatMap(u -> Mono
                         .just(u)
                         .doOnNext(bool -> userProducer.sendCreatedEvent(user).subscribeOn(Schedulers.boundedElastic()).subscribe())
@@ -67,18 +58,17 @@ public class UserService {
     }
 
     public Mono<User> updateUser(User user) {
-        return createUser(user);
+         return saveUser(user);
+    }
+
+    private Mono<User> saveUser(User user) {
+        return userClient
+                .createUser(user)
+                .flatMap(userRepository::save);
     }
 
     public Mono<Void> deleteUser(String email) {
         return userRepository.deleteByEmail(email);
     }
 
-    public Mono<String> getParameter(String name){
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> {
-                    OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) securityContext.getAuthentication();
-                    return (String) authentication.getPrincipal().getAttributes().get(name);
-                });
-    }
 }
