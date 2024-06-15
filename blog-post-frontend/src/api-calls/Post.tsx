@@ -11,7 +11,7 @@ export const getPosts = async (
 ): Promise<Page<PostResponse>> => {
     let url = `${serverURL}/blog-post-service/posts/?size=10&page=${page}`;
     if (authorId) url += `&authorId=${authorId}`;
-    console.log(url);
+
     return axios
         .get(url, { withCredentials: true })
         .then(response => response.data)
@@ -39,6 +39,7 @@ export const addPost = async (title: string, content: string, headerImageURL: st
             return response.data;
         }).catch((error: any) => openSnack('error', `Помилка створення ${error.response?.data.error}`))
 }
+
 export const updatePost = async (id: string | number, title: string, content: string, headerImageURL: string, openSnack: (severity: Severity, message: string) => void): Promise<PostResponse | void> => {
     const postRequestBody: PostRequest = {
         title: title,
