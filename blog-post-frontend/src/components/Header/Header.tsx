@@ -27,6 +27,7 @@ const Header: React.FC = () => {
             const onError = () => setUser(unauthorizedUser);
 
             const response = await getCurrentUser(onSuccess, onError);
+            console.log(response)
             if (response) {
                 setUser({ ...response });
             }
@@ -54,7 +55,7 @@ const Header: React.FC = () => {
                                     :
                                     <img className="pfp" src={pfpUrl ? pfpUrl : defaultPfp} alt="Profile" />
                             }
-                            <Link to="/profile" className="profile-text">Профіль</Link>
+                            <Link to="/redirect-to-profile" className="profile-text">Профіль</Link>
                         </div>
                         :
                         <div className="profile-text-container">
