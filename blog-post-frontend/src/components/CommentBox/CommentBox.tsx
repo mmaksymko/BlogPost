@@ -13,9 +13,11 @@ interface CommentBoxProps {
     onBlur?: () => void;
     value?: string;
     fullWidth?: boolean;
+    noArrow?: boolean;
+    maxLength?: number;
 }
 
-const CommentBox: React.FC<CommentBoxProps> = ({ minRows = 1, maxRows = 4, placeholder, onClick, onChange, onBlur, autoFocus = false, value = '', fullWidth = false }) => {
+const CommentBox: React.FC<CommentBoxProps> = ({ minRows = 1, maxRows = 4, placeholder, onClick, onChange, onBlur, autoFocus = false, value = '', fullWidth = false, noArrow = false, maxLength }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [text, setText] = useState(value);
 
@@ -80,10 +82,13 @@ const CommentBox: React.FC<CommentBoxProps> = ({ minRows = 1, maxRows = 4, place
                 onKeyDown={handleKeyDown}
                 autoFocus={autoFocus}
                 value={text}
+                maxLength={maxLength}
             />
-            <div onMouseDown={handleClick}>
-                <SendIcon className='send-icon' />
-            </div>
+            {!noArrow &&
+                <div onMouseDown={handleClick}>
+                    <SendIcon className='send-icon' />
+                </div>
+            }
         </section>
     );
 }
