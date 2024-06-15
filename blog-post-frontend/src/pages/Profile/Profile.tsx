@@ -6,7 +6,7 @@ import { SnackBarContext, defaultSnackBar, Severity } from '../../contexts/Snack
 import { getPosts } from '../../api-calls/Post';
 import { changePfp, editUser, getUser, logout } from '../../api-calls/User';
 import { AuthContext } from '../../contexts/AuthContext';
-import { redirect, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../../components/Button';
 import { UserResponse } from '../../models/User';
 import CommentBox from '../../components/CommentBox';
@@ -28,6 +28,7 @@ const Profile: React.FC = () => {
     const [lastName, setLastName] = useState<string | undefined>('');
     const [email, setEmail] = useState<string | undefined>('');
 
+    const redirect = (location: string) => window.location.href = location;
     const navigate = useNavigate();
     useEffect(() => {
         const identificator = paramUserId ? parseInt(paramUserId) : id;
