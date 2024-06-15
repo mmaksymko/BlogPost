@@ -85,7 +85,7 @@ public class UserService {
 
         User user = userRepository.findById(userId).orElseThrow();
 
-        String imageUrl = imageClient.uploadImage(image, PPF_BUCKET);
+        String imageUrl = imageClient.uploadImage(PPF_BUCKET, image);
         user.setPfpUrl(imageUrl);
 
         UserResponse response = userMapper.toResponse(userRepository.save(user));
