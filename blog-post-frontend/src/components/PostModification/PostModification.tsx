@@ -136,7 +136,9 @@ const PostModification: React.FC<PostModificationProps> = ({ isEdit = false, ima
     return (
         <div className='create-post-container'>
             <div className='page-header-title'>
-                Створення поста
+                {
+                    isEdit ? 'Редагування публікації' : 'Створення публікації'
+                }
             </div>
             <input
                 ref={fileInputRef}
