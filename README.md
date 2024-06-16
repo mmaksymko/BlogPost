@@ -1,3 +1,24 @@
+## About
+Blogpost is a small-scale blogging project, designed with a microservice architecture.
+## Tech Stack
+* **Spring**:
+	* **Boot** *(including **Spring Boot Starter Mail** for sending emails)*
+	* **Data**
+	* **Web**
+	* **WebFlux** *(Gateway Server is built on top of Project Reactor)*
+	* **Security** *(Google OAuth2.0, JWT tockens)*
+	* **Cloud**
+		* **Config** *(external configuration located in [this github repo](https://github.com/mmaksymko/blogpost-config/)*.
+		* **Gateway**
+* **JUnit** and **Mockito**
+* ***Netflix Eureka***
+* **PostgreSQL**
+* **Resilience4j** *(**retry**, **circuit breaker** and **rate limiter** patterns were used for fault tolerance)*
+* **OpenFeign** *(for HTPP calls between microservices)*
+* **Kafka** *(for decoupled event-driven communication between microservices)*
+* **Redis** *(for caching)*
+* **Minio** *(fully S3-compatible object storage system)*
+* **React** with **Typescript**
 ## Installation
 > You need to have docker installed *(see https://docs.docker.com/engine/install/)*
 1. Set up Google Credentials
@@ -38,3 +59,18 @@ The example is for **Gmail**, but you can use your prefered e-mail provider.
 	docker-compose -f blog-post-backend/docker/docker-compose.yml up --build -d ;
 	docker-compose -f blog-post-frontend/docker/docker-compose.yml up --build -d
 ```
+## Some Screenshots
+**Main page:**:
+![image](https://i.ibb.co/NtbdSMg/2024-06-16-151536.png)
+**Post creation with Markdown, HTML, LaTeX render, syntax highlighting in code and shortcuts for emojis:**
+![image](https://i.ibb.co/9bM1dJK/2024-06-16-043528.png)
+**Created post including reactions:**
+![image](https://i.ibb.co/qB4WVSm/2024-06-16-044041.png)
+**Post editing:**
+![image](https://i.ibb.co/H73chCL/2024-06-16-043614.png)
+**Comments section including deleted and edited ones and reactions:**
+![image](https://i.ibb.co/Wz5rgyQ/2024-06-16-050731.png)
+**Current user's profile page in editing mode:**
+![image](https://i.ibb.co/HHjFv88/2024-06-16-050948.png)
+**Different user's profile page:**
+![image](https://i.ibb.co/gFGwTJY/2024-06-16-052115.png)
