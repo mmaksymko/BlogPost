@@ -24,4 +24,6 @@ FROM nginx:1.21.1-alpine
 # Copy the build output to replace the default Nginx contents.
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
+RUN echo "server { listen 80; location / { root /usr/share/nginx/html; try_files \$uri /index.html; } }" > /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
