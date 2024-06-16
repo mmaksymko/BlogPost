@@ -53,7 +53,7 @@ The example is for **Gmail**, but you can use your prefered e-mail provider.
 	- `MINIO_ACCESS_KEY`
 	- `MINIO_SECRET_KEY`
 	- `JWT_SECRET_KEY`
-6. To start the application run in console the nxt command:
+6. To start the application run in console the next command:
 ```
 	docker network create blogpost-network ; 
 	docker-compose -f blog-post-backend/docker/docker-compose.yml up --build -d ;
