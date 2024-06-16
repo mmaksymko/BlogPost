@@ -29,8 +29,6 @@ const EditPost: React.FC = () => {
     }, []);
 
     const canModify = (user: number) => {
-        console.log(user)
-        console.log(userId)
         return role === UserRole.ADMIN || role === UserRole.SUPER_ADMIN || userId === user;
     }
 

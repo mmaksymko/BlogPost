@@ -179,7 +179,6 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
 
     const handleCommentEditing = async () => {
         if (editCommentContent && editCommentContent !== commentContent) {
-            console.log(editCommentContent, commentContent)
             var result = await updateComment(comment.commentId, editCommentContent, openSnack);
 
             if (result) {

@@ -31,8 +31,6 @@ export const editUser = async (id: string | number, firstName: string, lastName:
 }
 
 export const changePfp = async (id: string | number, file: File, openSnack: (severity: Severity, message: string) => void): Promise<UserResponse | void> => {
-    console.log(file);
-
     const imageFormData = new FormData()
     imageFormData.append('file', file);
 

@@ -27,7 +27,6 @@ const Header: React.FC = () => {
             const onError = () => setUser(unauthorizedUser);
 
             const response = await getCurrentUser(onSuccess, onError);
-            console.log(response)
             if (response) {
                 setUser({ ...response });
             }
