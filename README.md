@@ -18,6 +18,7 @@ Blogpost is a small-scale blogging project, designed with a microservice archite
 * **Kafka** *(for decoupled event-driven communication between microservices)*
 * **Redis** *(for caching)*
 * **Minio** *(fully S3-compatible object storage system)*
+* **Micrometer** and **Zipkin** *(for a distributed tracing system)*
 * **React** with **Typescript**
 ## Installation
 > You need to have docker installed *(see https://docs.docker.com/engine/install/)*
