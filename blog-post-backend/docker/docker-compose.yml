@@ -282,6 +282,14 @@ services:
       blogpost-network:
         aliases:
           - minio
+  zipkin:
+    image: openzipkin/zipkin:latest
+    ports:
+      - '9411:9411'
+    networks:
+      blogpost-network:
+        aliases:
+          - zipkin
 networks:
   blogpost-network:
     driver: bridge
