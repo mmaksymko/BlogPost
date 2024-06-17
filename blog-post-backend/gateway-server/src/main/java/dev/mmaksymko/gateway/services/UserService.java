@@ -1,19 +1,21 @@
 package dev.mmaksymko.gateway.services;
 
 import dev.mmaksymko.gateway.clients.UserClient;
-import dev.mmaksymko.gateway.configs.security.CurrentUserInfo;
 import dev.mmaksymko.gateway.dto.UserResponse;
 import dev.mmaksymko.gateway.models.User;
-import dev.mmaksymko.gateway.models.UserRole;
 import dev.mmaksymko.gateway.repositories.UserRepository;
 import dev.mmaksymko.gateway.services.kafka.UserProducer;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+
+import java.util.Map;
 
 @Service
 @CircuitBreaker(name = "circuit-breaker-auth")
@@ -22,20 +24,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserProducer userProducer;
     private final UserClient userClient;
-    private final CurrentUserInfo currentUser;
-
-    public Mono<UserResponse> getCurrentUser() {
-        Long id = currentUser.getId();
-
-        return getUser(id).map(user -> UserResponse.builder()
-                .id(user.getId())
-                .role(user.getRole())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .pfpUrl(user.getPfpUrl())
-                .build());
-    }
 
     public Mono<User> getUser(Long userId) {
         return userClient.getUser(userId);

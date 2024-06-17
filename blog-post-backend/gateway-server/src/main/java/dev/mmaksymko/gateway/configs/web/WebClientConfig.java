@@ -28,7 +28,7 @@ public class WebClientConfig {
     }
 
     @Bean
-    UserClient postClient(WebClient webClient) {
+    UserClient userClient(WebClient webClient) {
         WebClient client = webClient
                 .mutate()
                 .filter(authFilter)

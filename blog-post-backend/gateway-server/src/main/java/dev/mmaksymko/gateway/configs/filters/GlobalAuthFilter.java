@@ -1,7 +1,9 @@
 package dev.mmaksymko.gateway.configs.filters;
 
-import dev.mmaksymko.gateway.configs.security.CurrentUserInfo;
 import dev.mmaksymko.gateway.configs.web.JwtManager;
+import dev.mmaksymko.gateway.services.CurrentUserService;
+import dev.mmaksymko.gateway.services.UserService;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +13,8 @@ import reactor.core.publisher.Mono;
 
 @Configuration
 public class GlobalAuthFilter extends AuthFilter implements GlobalFilter {
-    public GlobalAuthFilter(CurrentUserInfo user, JwtManager jwtManager) {
-        super(jwtManager, user);
+    public GlobalAuthFilter(JwtManager jwtManager, ObjectProvider<CurrentUserService> userServiceProvider) {
+        super(jwtManager, userServiceProvider);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package dev.mmaksymko.gateway.handlers;
 
 import dev.mmaksymko.gateway.configs.FrontEndProperties;
-import dev.mmaksymko.gateway.configs.security.CurrentUserInfo;
 import dev.mmaksymko.gateway.models.User;
 import dev.mmaksymko.gateway.models.UserRole;
 import dev.mmaksymko.gateway.services.UserService;
@@ -31,7 +30,6 @@ import java.util.*;
 @Log4j2
 public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHandler {
     private final UserService userService;
-    private final CurrentUserInfo currentUserId;
     private final FrontEndProperties frontEndProperties;
 
     @Override
@@ -57,8 +55,6 @@ public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHan
     public Mono<Void> handleUserAuthentication(User user, Map<String, Object> attributes, OAuth2AuthenticationToken oAuth2AuthenticationToken) {
         return Mono
                 .just(new DefaultOAuth2User(List.of(new SimpleGrantedAuthority(user.getRole().name())), attributes, "email"))
-                .doOnNext(__ -> currentUserId.setId(user.getId()))
-                .doOnNext(__ -> currentUserId.setRole(user.getRole()))
                 .map(newUser -> new OAuth2AuthenticationToken(newUser,
                 List.of(new SimpleGrantedAuthority(user.getRole().name()),
                         new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),

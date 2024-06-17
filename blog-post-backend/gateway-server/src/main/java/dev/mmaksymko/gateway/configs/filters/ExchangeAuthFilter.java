@@ -1,7 +1,8 @@
 package dev.mmaksymko.gateway.configs.filters;
 
-import dev.mmaksymko.gateway.configs.security.CurrentUserInfo;
 import dev.mmaksymko.gateway.configs.web.JwtManager;
+import dev.mmaksymko.gateway.services.CurrentUserService;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -12,8 +13,8 @@ import reactor.core.publisher.Mono;
 
 @Configuration
 public class ExchangeAuthFilter extends AuthFilter implements ExchangeFilterFunction {
-    public ExchangeAuthFilter(JwtManager jwtManager, CurrentUserInfo user) {
-        super(jwtManager, user);
+    public ExchangeAuthFilter(JwtManager jwtManager, ObjectProvider<CurrentUserService> userServiceProvider) {
+        super(jwtManager, userServiceProvider);
     }
 
     @Override
